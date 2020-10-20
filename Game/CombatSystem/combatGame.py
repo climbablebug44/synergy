@@ -45,5 +45,18 @@ class combatGame(object):
             pygame.draw.rect(self.screen, (255, 0, 0), self.enemy.stunRect)
 
             self.allSprites.draw(self.screen)
-            pygame.display.flip()
+            pygame.display.flip()            
+            x = self.checkResult()
+            if x is not None:
+                return x
             self.clock.tick(60)
+            
+
+    def checkResult(self):
+        if self.enemy not in self.playingEntities:
+            return True
+        elif self.player not in self.playingEntities:
+            return False
+        else:
+            return None
+            
