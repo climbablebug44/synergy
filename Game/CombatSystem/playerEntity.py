@@ -197,7 +197,7 @@ class player(combatEntity):
         self.keys = pygame.key.get_pressed()
         self.mouse = pygame.mouse.get_pressed()
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_p and self.magicBar.currLevel(20):
+            if event.key == pygame.K_p and self.magicBar.currentLevel() >= 20:
                 # Force Field
                 projectiles.forceField(self.group[1], creator=self, direction=self.facing)
                 projectiles.forceField(self.group[1], creator=self, direction=not self.facing)
