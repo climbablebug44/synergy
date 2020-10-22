@@ -3,32 +3,52 @@ import random
 from CombatSystem import projectiles, collectibles, gameConstants as gc
 
 
-class attackCooldown:
-    def __init__(self, cooldown, prevTime, currLevel, maxLevel):
-        self.cooldown = cooldown
-        self.prevTime = prevTime
-        self.currLevel = currLevel
-        self.d = maxLevel
+class deltaTime:
+    def __init__(self):
+        self.prevTime = pygame.time.get_ticks()
 
-    def checkCooldown(self, cldwn=-1):
-        if cldwn != -1:
-            check = cldwn
-        else:
-            check = self.cooldown
-        time = pygame.time.get_ticks()
-        if time - self.prevTime > check:
-            self.prevTime = time
+    def delta(self, delta, change=True):
+        ticks = pygame.time.get_ticks()
+        if ticks - self.prevTime >= delta:
+            if change:
+                self.prevTime = ticks
             return True
         else:
             return False
 
-    def gradualIncrease(self, k):
-        self.currLevel += k
-        if self.currLevel > self.d:
-            self.currLevel = self.d
+    def updateTicks(self):
+        self.prevTime = pygame.time.get_ticks()
+
+
+class attackCooldown:
+    def __init__(self, maxCapacity):
+        self.time = deltaTime()
+        self.maxCapacity = maxCapacity
+        self.currLevel = maxCapacity
+
+    def increase(self, increaseBy, delta):
+        if self.time.delta(delta):
+            self.currLevel += increaseBy
+            if self.currLevel > self.maxCapacity:
+                self.currLevel = self.maxCapacity
+
+    def decrease(self, decreaseBy):
+        self.currLevel -= decreaseBy
+        if self.currLevel <= 0:
+            self.currLevel = 0
+            self.time.updateTicks()
+
+    def currentLevel(self, x=-1):
+        if x != -1:
+            if self.currLevel == x:
+                return True
+            else:
+                return False
+        else:
+            return self.currLevel
 
     def fill(self):
-        self.currLevel = self.d
+        self.currLevel = self.maxCapacity
 
 
 class combatEntity(pygame.sprite.Sprite):
@@ -46,7 +66,8 @@ class combatEntity(pygame.sprite.Sprite):
         self.rect = pygame.Rect(0, 0, gc.playerSize[0], gc.playerSize[1])
         self.platform = platform
         self.group = groups
-        self.stun = attackCooldown(100, pygame.time.get_ticks(), 100, 100)
+        self.stunBar = attackCooldown(100)  # MAX Capacity
+        self.stunTime = 1500
 
     def transform(self, vect, vel):
         x = (vect[0] - self.rect.x) // 10
@@ -60,8 +81,8 @@ class combatEntity(pygame.sprite.Sprite):
 
     def update(self, *args):
         """Stun Cooldown"""
-        if self.stun.currLevel == 0 and self.stun.checkCooldown(cldwn=3000):
-            self.stun.fill()
+        if self.stunBar.currentLevel(0) and self.stunBar.time.delta(self.stunTime):
+            self.stunBar.fill()
         ''' Gravity Code'''
         if self.rect.colliderect(self.platform) and self.rect.y >= self.platform.y - gc.playerSize[1]:
             self.jumping = False
@@ -74,20 +95,15 @@ class combatEntity(pygame.sprite.Sprite):
         '''L-R bounds'''
         if self.rect.x < 0:
             self.rect.x = 0
-            if self.velocity[0] != 0:
-                if self.stun.currLevel > 5:
-                    self.stun.currLevel -= 5
         if self.rect.x > gc.screenSize[0] - gc.playerSize[0]:
             self.rect.x = gc.screenSize[0] - gc.playerSize[0]
-            if self.stun.currLevel > 5:
-                self.stun.currLevel -= 5
         '''/bounds'''
 
         if self.health <= 0:
             self.kill()
 
     def damage(self, hit):
-        if not self.blocking or self.stun.currLevel == 0:
+        if not self.blocking or self.stunBar.currentLevel(0):
             self.health -= hit
             if self.health > 375:
                 self.health = 375
@@ -95,12 +111,11 @@ class combatEntity(pygame.sprite.Sprite):
                 self.health = 0
 
     def eventHandle(self, event=None):
-        pass
-        ''' 
+        """
             Used in player class
             to update only when an event occurs
             Has no use here
-        '''
+        """
 
 
 class player(combatEntity):
@@ -109,13 +124,14 @@ class player(combatEntity):
         self.image = pygame.transform.scale(pygame.image.load('assets/player.png'), gc.playerSize)
         self.moveX = 6
         self.moveY = 20
-        self.magicBar = attackCooldown(100, pygame.time.get_ticks(), 100, 100)
+        self.magicBar = attackCooldown(100)  # Max Capacity
         self.healthRect = pygame.Rect(self.rect.x, self.rect.y, 100, 5)
         self.enemy = None
         self.keys = pygame.key.get_pressed()
         self.mouse = pygame.mouse.get_pressed()
-        self.attacks = [self.chargedAttack, self.rushAttack, self.whirlWindStrike, self.magicWeapon]
+        self.attacks = [self.dashAttack, self.rushAttack, self.whirlWindStrike, self.magicWeapon]
         self.slot = 0
+        self.dashing = False
         # Call an attack: self.attacks[i]()
 
     def updateHealthBar(self):
@@ -134,23 +150,29 @@ class player(combatEntity):
         self.updateHealthBar()
 
         '''Magic Bar fills'''
-        if self.magicBar.checkCooldown():
-            self.magicBar.gradualIncrease(1)
+        self.magicBar.increase(1, 100)
 
         if self.velocity[0] == 0:
             self.movement()
+            self.tangible = True
+            self.dashing = False
         else:
             if self.velocity[0] > 0:
                 self.velocity[0] -= 1
             else:
                 self.velocity[0] += 1
 
+        if self.dashing and self.rect.colliderect(self.enemy.rect):
+            self.enemy.damage(20)
+            self.dashing = False
+            print('[Player]: Dash Special Attack Success')
+
         '''Super Call'''
         super(player, self).update()
 
     def movement(self):
         moveFr, moveBa = True, True
-        if self.tangible:
+        if self.tangible and self.enemy.tangible:
             if self.enemy.rect.colliderect(self.rect):
                 if self.rect.x > self.enemy.rect.x:
                     moveBa = False
@@ -175,11 +197,13 @@ class player(combatEntity):
         self.keys = pygame.key.get_pressed()
         self.mouse = pygame.mouse.get_pressed()
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_p and self.magicBar.currLevel > 20:
+            if event.key == pygame.K_p and self.magicBar.currLevel(20):
                 # Force Field
                 projectiles.forceField(self.group[1], creator=self, direction=self.facing)
                 projectiles.forceField(self.group[1], creator=self, direction=not self.facing)
-                self.magicBar.currLevel -= 20
+                self.magicBar.decrease(20)
+
+            '''Change - Slot'''
             if event.key == pygame.K_w:
                 self.slot = (self.slot + 1) % 4
             elif event.key == pygame.K_s:
@@ -190,7 +214,8 @@ class player(combatEntity):
                 projectiles.bullets(self.group[1], creator=self,
                                     vel=(self.transform(pygame.mouse.get_pos(), 30.0)))
             elif self.mouse[0]:
-                self.meleeAttack(True)
+                # self.meleeAttack(True)s
+                self.attacks[self.slot]()
 
     def meleeAttack(self, aType: bool):
         # aType true means heavy attack false means light attack
@@ -209,8 +234,10 @@ class player(combatEntity):
                 self.enemy.damage(10)
                 print('player light')
 
-    def chargedAttack(self):
-        pass
+    def dashAttack(self):
+        self.tangible = False
+        self.dashing = True
+        self.velocity[0] = (lambda x: 20 if x else -20)(self.facing)
 
     def rushAttack(self):
         pass
@@ -241,9 +268,9 @@ class EnemyAI(combatEntity):
     def update(self, *args, ):
         self.rect = self.rect.move(self.velocity)
         self.healthRect = pygame.rect.Rect(20, 20, (self.health / 375) * 750, 10)
-        self.stunRect = pygame.rect.Rect(70, 40, (self.stun.currLevel / 100) * 600, 5)
+        self.stunRect = pygame.rect.Rect(70, 40, (self.stunBar.currentLevel() / 100) * 600, 5)
         '''Randomly Shoot towards player'''
-        if self.stun.currLevel > 0:
+        if not self.stunBar.currentLevel(0):
             if random.randint(0, 200) < 3:
                 self.shootPlayer()
             if random.randint(0, 100) == 3:
@@ -276,7 +303,7 @@ class EnemyAI(combatEntity):
                 self.moveInDirection(not self.facing)
 
             self.invisibleRect.x, self.invisibleRect.y = self.rect.x - 75, self.rect.y
-            if self.tangible:
+            if self.tangible and self.player.tangible:
                 if self.rect.colliderect(self.player.rect):
                     if self.rect.x > self.player.rect.x:
                         self.rect.x = self.player.rect.x + 75
@@ -290,7 +317,8 @@ class EnemyAI(combatEntity):
                             self.velocity[1] = -15
                             self.jumping = True
                         self.moveInDirection(self.facing)
-
+        else:
+            self.velocity[0] = 0
         super(EnemyAI, self).update()
 
     def shootPlayer(self):
@@ -319,8 +347,7 @@ class EnemyAI(combatEntity):
         x = random.randint(0, 10)
         if x != 1:
             return
-        elif not self.player.blocking or self.player.stun.currLevel < 20:
-            self.player.stun.currLevel = 0
+        elif not self.player.blocking:  # TODO: Add player stun
             self.tangible = False
             self.moveInDirection(not self.facing, 30)
             self.player.damage(30)
@@ -355,11 +382,7 @@ class EnemyAI(combatEntity):
 
     def damage(self, hit):
         super(EnemyAI, self).damage(hit)
-        self.stun.currLevel -= 10
-        if self.stun.currLevel <= 0:
-            self.stun.currLevel = 0
-            self.stun.prevTime = pygame.time.get_ticks()
-            # Refresh ticks
+        self.stunBar.decrease(10)
         if random.randint(0, 120) == 1:
             collectibles.healthBoost(self.group, floor=self.platform, pos=(self.rect.x, self.rect.y),
                                      dire=not self.facing,
