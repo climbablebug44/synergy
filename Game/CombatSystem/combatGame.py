@@ -19,11 +19,18 @@ class combatGame(object):
         self.running = True
 
         # Mainloop Starts Here: ->
-        self.mainLoop()
+        self.state = self.mainLoop()
 
     def constructBackground(self):
         # self.allSprites.add(backgroundElements)
-        pass
+        """
+            For many sprites that have different positions but same image, blitting saves more space and makes more
+            sense.
+            TODO: blit other background elements
+        """
+        grassblock = pygame.transform.scale(pygame.image.load('assets/grass.png'), (80, 80))
+        for i in range(20):
+            self.screen.blit(grassblock, ((80 * i), c.screenSize[1] - 30))
 
     def mainLoop(self):
 
@@ -34,6 +41,9 @@ class combatGame(object):
                     exit()
                 if event.type == pygame.KEYDOWN or event.type == pygame.KEYUP or event.type == pygame.MOUSEBUTTONDOWN:
                     self.player.eventHandle(event)
+                    # TODO: Remove later
+                    if event.key == pygame.K_q:
+                        exit()
 
             self.screen.fill(c.color['BLACK'])
             self.constructBackground()  # Draws background
@@ -45,12 +55,12 @@ class combatGame(object):
             pygame.draw.rect(self.screen, (255, 0, 0), self.enemy.stunRect)
 
             self.allSprites.draw(self.screen)
-            pygame.display.flip()            
+            pygame.display.flip()
+            self.clock.tick(60)
+
             x = self.checkResult()
             if x is not None:
                 return x
-            self.clock.tick(60)
-            
 
     def checkResult(self):
         if self.enemy not in self.playingEntities:
@@ -59,4 +69,3 @@ class combatGame(object):
             return False
         else:
             return None
-            
