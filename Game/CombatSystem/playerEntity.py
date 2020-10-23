@@ -351,7 +351,7 @@ class EnemyAI(combatEntity):
         elif not self.player.blocking:  # TODO: Add player stun
             self.tangible = False
             self.moveInDirection(not self.facing, 30)
-            self.player.damage(30)
+            self.player.damage(30, 10)
             print('[Enemy]: Heavy Attack')
 
     def attackPlayerLight(self):
@@ -360,7 +360,7 @@ class EnemyAI(combatEntity):
             return
         elif not self.player.blocking:
             self.moveInDirection(not self.facing)
-            self.player.damage(30)
+            self.player.damage(30, 5)
             print('[Enemy]: Light Attack')
 
     def slowDown(self):
