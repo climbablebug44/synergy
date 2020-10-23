@@ -41,9 +41,6 @@ class combatGame(object):
                     exit()
                 if event.type == pygame.KEYDOWN or event.type == pygame.KEYUP or event.type == pygame.MOUSEBUTTONDOWN:
                     self.player.eventHandle(event)
-                    # TODO: Remove later
-                    if event.key == pygame.K_q:
-                        exit()
 
             self.screen.fill(c.color['BLACK'])
             self.constructBackground()  # Draws background
@@ -51,7 +48,6 @@ class combatGame(object):
 
             '''Drawing Health bars'''
             pygame.draw.rect(self.screen, (0, 255, 0), self.player.healthRect)
-            pygame.draw.rect(self.screen, (0, 255, 0), self.enemy.healthRect)
             pygame.draw.rect(self.screen, (255, 0, 0), self.enemy.stunRect)
 
             self.allSprites.draw(self.screen)
