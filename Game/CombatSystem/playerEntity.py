@@ -1,6 +1,6 @@
 import pygame
 import random
-from CombatSystem import projectiles, collectibles, gameConstants as gc
+from CombatSystem import projectiles, collectibles, gameConstants as gc, screenElements
 
 
 class deltaTime:
@@ -54,6 +54,7 @@ class attackCooldown:
 class combatEntity(pygame.sprite.Sprite):
     def __init__(self, *groups, ssmanager, platform, time):
         super().__init__(*groups)
+        self.rect = pygame.Rect(0, 0, gc.playerSize[0], gc.playerSize[1])
         self.clock = time
         self.gravity = 1
         self.sSManager = ssmanager
@@ -63,11 +64,10 @@ class combatEntity(pygame.sprite.Sprite):
         self.blocking = False
         self.facing = True
         self.tangible = True
-        self.rect = pygame.Rect(0, 0, gc.playerSize[0], gc.playerSize[1])
         self.platform = platform
         self.group = groups
-        self.stunBar = attackCooldown(100)  # MAX Capacity
-        self.stunTime = 1500
+        self.stunBar = attackCooldown(100)  # MAX Capacity, units
+        self.stunTime = 1500  # ms
 
     def transform(self, vect, vel):
         x = (vect[0] - self.rect.x) // 10
@@ -102,7 +102,9 @@ class combatEntity(pygame.sprite.Sprite):
         if self.health <= 0:
             self.kill()
 
-    def damage(self, hit):
+    def damage(self, hit, stun):
+        if not self.stunBar.currentLevel(0):
+            self.stunBar.decrease(stun)
         if not self.blocking or self.stunBar.currentLevel(0):
             self.health -= hit
             if self.health > 375:
@@ -163,7 +165,7 @@ class player(combatEntity):
                 self.velocity[0] += 1
 
         if self.dashing and self.rect.colliderect(self.enemy.rect):
-            self.enemy.damage(20)
+            self.enemy.damage(20, 5)
             self.dashing = False
             print('[Player]: Dash Special Attack Success')
 
@@ -257,17 +259,16 @@ class EnemyAI(combatEntity):
         self.walking = False
         self.invisibleRect = pygame.rect.Rect(self.rect.x - 50, self.rect.y, 225, gc.playerSize[1])
         self.player = None
-        self.healthRect = pygame.rect.Rect(20, 20, (self.health / 375) * 700, 10)
         self.stunRect = pygame.rect.Rect(20, 50, (self.health / 100) * 600, 10)
         '''Get player'''
         for i in self.group[0]:
             if i != self:
                 self.player = i
                 break
+        self.healthBar = screenElements.healthBar(groups[1], MaxLevel=375, entity=self)
 
     def update(self, *args, ):
         self.rect = self.rect.move(self.velocity)
-        self.healthRect = pygame.rect.Rect(20, 20, (self.health / 375) * 750, 10)
         self.stunRect = pygame.rect.Rect(70, 40, (self.stunBar.currentLevel() / 100) * 600, 5)
         '''Randomly Shoot towards player'''
         if not self.stunBar.currentLevel(0):
@@ -276,7 +277,7 @@ class EnemyAI(combatEntity):
             if random.randint(0, 100) == 3:
                 self.walking = not self.walking
 
-            if self.rect.x > 700 or self.rect.x < 100:
+            if self.rect.x > gc.screenSize[0] - 100 or self.rect.x < 100:
                 if random.randint(0, 1):
                     self.walking = False
                 else:
@@ -380,9 +381,8 @@ class EnemyAI(combatEntity):
         else:
             return x_, y_
 
-    def damage(self, hit):
-        super(EnemyAI, self).damage(hit)
-        self.stunBar.decrease(10)
+    def damage(self, hit, stun):
+        super(EnemyAI, self).damage(hit, stun)
         if random.randint(0, 120) == 1:
             collectibles.healthBoost(self.group, floor=self.platform, pos=(self.rect.x, self.rect.y),
                                      dire=not self.facing,
