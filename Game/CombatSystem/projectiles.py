@@ -32,19 +32,19 @@ class bullets(projectiles):
             if i != self.creator and i != self and i.rect.colliderect(self.rect):
                 if isinstance(i, playerEntity.combatEntity):
                     '''Reducing health'''
-                    i.damage(10)
+                    i.damage(10, 5)
                     self.kill()
 
 
 class forceField(projectiles):
-    def __init__(self, *groups, creator, direction, pushvel=10, damage = 1):
+    def __init__(self, *groups, creator, direction, pushvel=10, damage=1):
         super().__init__(*groups, creator=creator)
         self.rect = pygame.rect.Rect(self.creator.rect.x, self.creator.rect.y, 1, 100)
         self.image = pygame.transform.scale(pygame.image.load('assets/enemy.png'), (1, 100))
         if direction:
-            self.velocity = (10, 0)
+            self.velocity = (30, 0)
         else:
-            self.velocity = (-10, 0)
+            self.velocity = (-30, 0)
         self.pushvel = pushvel
         self.damage = damage
 
@@ -56,5 +56,5 @@ class forceField(projectiles):
                     i.velocity[0] = self.pushvel
                 else:
                     i.velocity[0] = -self.pushvel
-                i.damage(self.damage)
+                i.damage(self.damage, 20)
                 self.kill()
