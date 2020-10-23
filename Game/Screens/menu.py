@@ -11,7 +11,7 @@ class Menu():
 
     def blit_screen(self):
         self.game.window.blit(self.game.display, (0, 0))
-        image = pygame.image.load(r'C:\Users\ash56\Downloads\Action-Mania.png')
+        image = pygame.image.load(r'Screens/Action-Mania.png')
         image = pygame.transform.scale(image,(450,150))
         self.game.window.blit(image,(200,0));
         pygame.display.update()
