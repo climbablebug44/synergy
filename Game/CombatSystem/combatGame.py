@@ -41,6 +41,9 @@ class combatGame(object):
                     exit()
                 if event.type == pygame.KEYDOWN or event.type == pygame.KEYUP or event.type == pygame.MOUSEBUTTONDOWN:
                     self.player.eventHandle(event)
+                if event.type == pygame.KEYDOWN or event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
+                    pass
+                    # TODO: pause
 
             self.screen.fill(c.color['BLACK'])
             self.constructBackground()  # Draws background
