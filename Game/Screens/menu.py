@@ -1,4 +1,6 @@
 import pygame
+
+
 class Menu():
     def __init__(self, game):
         self.game = game
@@ -6,16 +8,18 @@ class Menu():
         self.run_display = True
         self.cursor_rect = pygame.Rect(0, 0, 20, 20)
         self.offset = - 100
+
     def draw_cursor(self):
-        self.game.draw_text('(-)', 20, self.cursor_rect.x, self.cursor_rect.y) 
+        self.game.draw_text('(-)', 20, self.cursor_rect.x, self.cursor_rect.y)
 
     def blit_screen(self):
         self.game.window.blit(self.game.display, (0, 0))
-        image = pygame.image.load(r'C:\Users\ash56\Downloads\Action-Mania.png')
-        image = pygame.transform.scale(image,(450,150))
-        self.game.window.blit(image,(200,0));
+        image = pygame.image.load(r'Screens/Action-Mania.png')
+        image = pygame.transform.scale(image, (450, 150))
+        self.game.window.blit(image, (200, 0));
         pygame.display.update()
         self.game.reset_keys()
+
 
 class MainMenu(Menu):
     def __init__(self, game):
@@ -36,10 +40,9 @@ class MainMenu(Menu):
             self.game.draw_text("Start Game", 25, self.startx, self.starty)
             self.game.draw_text("Settings", 25, self.optionsx, self.optionsy)
             self.game.draw_text("Credits", 25, self.creditsx, self.creditsy)
-            self.game.draw_text("Exit",25,self.mid_w,self.mid_h+130)
+            self.game.draw_text("Exit", 25, self.mid_w, self.mid_h + 130)
             self.draw_cursor()
             self.blit_screen()
-
 
     def move_cursor(self):
         if self.game.DOWN_KEY:
@@ -50,14 +53,14 @@ class MainMenu(Menu):
                 self.cursor_rect.midtop = (self.creditsx + self.offset, self.creditsy)
                 self.state = 'Credits'
             elif self.state == 'Credits':
-                self.cursor_rect.midtop = (self.mid_w + self.offset, self.mid_h+130)
+                self.cursor_rect.midtop = (self.mid_w + self.offset, self.mid_h + 130)
                 self.state = 'Exit'
             elif self.state == 'Exit':
                 self.cursor_rect.midtop = (self.startx + self.offset, self.starty)
                 self.state == 'Start'
         elif self.game.UP_KEY:
             if self.state == 'Start':
-                self.cursor_rect.midtop = (self.mid_w + self.offset, self.mid_h+130)
+                self.cursor_rect.midtop = (self.mid_w + self.offset, self.mid_h + 130)
                 self.state = 'Exit'
             elif self.state == 'Settings':
                 self.cursor_rect.midtop = (self.startx + self.offset, self.starty)
@@ -66,9 +69,8 @@ class MainMenu(Menu):
                 self.cursor_rect.midtop = (self.optionsx + self.offset, self.optionsy)
                 self.state = 'Settings'
             elif self.state == 'Exit':
-                self.cursor_rect.midtop = (self.creditsx + self.offset,self.creditsy)
+                self.cursor_rect.midtop = (self.creditsx + self.offset, self.creditsy)
                 self.state = 'Credits'
-                
 
     def check_input(self):
         self.move_cursor()
@@ -82,6 +84,7 @@ class MainMenu(Menu):
             elif self.state == 'Exit':
                 quit()
             self.run_display = False
+
 
 class OptionsMenu(Menu):
     def __init__(self, game):
@@ -100,7 +103,7 @@ class OptionsMenu(Menu):
             self.game.draw_text('Settings', 32, self.game.DISPLAY_W / 2, self.game.DISPLAY_H / 2 - 30)
             self.game.draw_text("Volume", 22, self.volx, self.voly)
             self.game.draw_text("Controls", 22, self.controlsx, self.controlsy)
-            self.game.draw_text("Language",22,self.mid_w, self.mid_h + 67)
+            self.game.draw_text("Language", 22, self.mid_w, self.mid_h + 67)
             self.draw_cursor()
             self.blit_screen()
 
@@ -114,13 +117,14 @@ class OptionsMenu(Menu):
                 self.cursor_rect.midtop = (self.controlsx + self.offset, self.controlsy)
             elif self.state == 'Controls':
                 self.state = 'Language'
-                self.cursor_rect.midtop = (self.mid_w + self.offset, self.mid_h + 67) 
+                self.cursor_rect.midtop = (self.mid_w + self.offset, self.mid_h + 67)
             elif self.state == 'Language':
                 self.state = 'Volume'
                 self.cursor_rect.midtop = (self.volx + self.offset, self.voly)
         elif self.game.START_KEY:
             # TO-DO: Create a Volume Menu and a Controls Menu
             pass
+
 
 class CreditsMenu(Menu):
     def __init__(self, game):
@@ -137,5 +141,3 @@ class CreditsMenu(Menu):
             self.game.draw_text('Credits', 35, self.game.DISPLAY_W / 2, self.game.DISPLAY_H / 2 - 20)
             self.game.draw_text('By team Synergy', 25, self.game.DISPLAY_W / 2, self.game.DISPLAY_H / 2 + 20)
             self.blit_screen()
-
-
