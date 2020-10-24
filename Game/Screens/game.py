@@ -68,8 +68,8 @@ class Game():
                     self.DOWN_KEY = True
                 if event.key == pygame.K_UP:
                     self.UP_KEY = True  
-            if event.type == pygame.K_p:
-                pause(self)
+            #if event.type == pygame.K_p:
+             #   pause(self)
                   
 
     def reset_keys(self):
