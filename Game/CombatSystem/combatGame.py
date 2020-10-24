@@ -1,6 +1,6 @@
 import pygame
-from CombatSystem import gameConstants as c, playerEntity
-from CombatSystem.spriteSheetManager import spriteSheetManager
+from Game.CombatSystem import gameConstants as c, playerEntity
+from Game.CombatSystem.spriteSheetManager import spriteSheetManager
 
 
 class combatGame(object):
