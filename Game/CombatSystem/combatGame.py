@@ -31,25 +31,31 @@ class combatGame(object):
         grassblock = pygame.transform.scale(pygame.image.load('assets/grass.png'), (80, 80))
         for i in range(20):
             self.screen.blit(grassblock, ((80 * i), c.screenSize[1] - 30))
+
     def pause(self):
+        print('in pause')
         paused = True
         while paused:
-            
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
-                    quit()
+                    exit()
                 if event.type == pygame.KEYDOWN:
-                     
                     if event.key == pygame.K_c:
                         paused = False
                     elif event.key == pygame.K_q:
                         pygame.quit()
-                        quit()
-        # pygame.display.fill(self.WhITE)
-        pygame.draw_text("Paused ",25,435,330)             
-        pygame.draw_text("Press c To continue and q to quit",25,435,400)
-        pygame.display.update()         
+                        exit()
+            self.draw_text("Paused ", 25, 400, 300)
+            self.draw_text("Press c To continue and q to quit", 25, 435, 400)
+            pygame.display.flip()
+
+    def draw_text(self, text, size, x, y):
+        font = pygame.font.Font('freesansbold.ttf', size)
+        text_surface = font.render(text, True, (255, 255, 255))
+        text_rect = text_surface.get_rect()
+        text_rect.center = (x, y)
+        self.screen.blit(text_surface, text_rect)
 
     def mainLoop(self):
 
@@ -60,8 +66,8 @@ class combatGame(object):
                     exit()
                 if event.type == pygame.KEYDOWN or event.type == pygame.KEYUP or event.type == pygame.MOUSEBUTTONDOWN:
                     self.player.eventHandle(event)
-                if event.type == pygame.KEYDOWN or event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
-                    pause()
+                if (event.type == pygame.KEYDOWN or event.type == pygame.KEYUP) and event.key == pygame.K_ESCAPE:
+                    self.pause()
                     # TODO: pause
 
             self.screen.fill(c.color['BLACK'])
