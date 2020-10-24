@@ -31,6 +31,25 @@ class combatGame(object):
         grassblock = pygame.transform.scale(pygame.image.load('assets/grass.png'), (80, 80))
         for i in range(20):
             self.screen.blit(grassblock, ((80 * i), c.screenSize[1] - 30))
+    def pause(self):
+        paused = True
+        while paused:
+            
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    quit()
+                if event.type == pygame.KEYDOWN:
+                     
+                    if event.key == pygame.K_c:
+                        paused = False
+                    elif event.key == pygame.K_q:
+                        pygame.quit()
+                        quit()
+        # pygame.display.fill(self.WhITE)
+        pygame.draw_text("Paused ",25,435,330)             
+        pygame.draw_text("Press c To continue and q to quit",25,435,400)
+        pygame.display.update()         
 
     def mainLoop(self):
 
@@ -42,7 +61,7 @@ class combatGame(object):
                 if event.type == pygame.KEYDOWN or event.type == pygame.KEYUP or event.type == pygame.MOUSEBUTTONDOWN:
                     self.player.eventHandle(event)
                 if event.type == pygame.KEYDOWN or event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
-                    pass
+                    pause()
                     # TODO: pause
 
             self.screen.fill(c.color['BLACK'])
