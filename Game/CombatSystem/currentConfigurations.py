@@ -1,3 +1,4 @@
+import _pickle
 import pickle
 
 
@@ -6,9 +7,9 @@ class playCombatConfig:
         self.health = 375
         self.stunTime = 1500
         self.maxCapacityStun = 100
+        self.maxCapacityMagicBar = 100
         self.moveX = 6
         self.moveY = 20
-        self.maxCapacityMagicBar = 100
         self.damage = {
             'light': 10,
             'heavy': 30
@@ -33,6 +34,9 @@ class playerConfig:
                 self.config = pickle.load(file)
         except FileNotFoundError:
             # No previous configurations exist, ie: game files are deleted or no save-file exists
+            self.config = playCombatConfig()
+            self.write()
+        except _pickle.UnpicklingError:
             self.config = playCombatConfig()
 
         if not isinstance(self.config, playCombatConfig):
