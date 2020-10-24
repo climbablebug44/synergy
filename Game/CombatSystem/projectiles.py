@@ -1,5 +1,5 @@
 import pygame
-from CombatSystem import playerEntity
+from Game.CombatSystem import playerEntity
 
 
 class projectiles(pygame.sprite.Sprite):
