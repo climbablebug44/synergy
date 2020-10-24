@@ -46,8 +46,8 @@ class combatGame(object):
                     elif event.key == pygame.K_q:
                         pygame.quit()
                         exit()
-            self.draw_text("Paused ", 25, 400, 300)
-            self.draw_text("Press c To continue and q to quit", 25, 435, 400)
+            self.draw_text("Paused ", 25, 300, 200)
+            self.draw_text("Press C To continue and Q to quit", 25, 335, 300)
             pygame.display.flip()
 
     def draw_text(self, text, size, x, y):
