@@ -1,6 +1,6 @@
 import pygame
 import random
-from CombatSystem import projectiles, collectibles, gameConstants as gc, screenElements
+from Game.CombatSystem import projectiles, collectibles, gameConstants as gc, screenElements, currentConfigurations
 
 
 class deltaTime:
@@ -59,15 +59,19 @@ class combatEntity(pygame.sprite.Sprite):
         self.gravity = 1
         self.sSManager = ssmanager
         self.velocity = [0, 0]
+        # data
         self.health = 375
+        # data
         self.jumping = True
         self.blocking = False
         self.facing = True
         self.tangible = True
         self.platform = platform
         self.group = groups
+        # data
         self.stunBar = attackCooldown(100)  # MAX Capacity, units
         self.stunTime = 1500  # ms
+        # data
 
     def transform(self, vect, vel):
         x = (vect[0] - self.rect.x) // 10
@@ -102,7 +106,7 @@ class combatEntity(pygame.sprite.Sprite):
         if self.health <= 0:
             self.kill()
 
-    def damage(self, hit, stun):
+    def damage(self, hit, stun=0):
         if not self.stunBar.currentLevel(0):
             self.stunBar.decrease(stun)
         if not self.blocking or self.stunBar.currentLevel(0):
@@ -123,10 +127,13 @@ class combatEntity(pygame.sprite.Sprite):
 class player(combatEntity):
     def __init__(self, *groups, ssmanager, platform, time):
         super().__init__(*groups, ssmanager=ssmanager, platform=platform, time=time)
+
+        playerConfig = currentConfigurations.playerConfig('player.pkl')
+        self.data = playerConfig.read()
+
         self.image = pygame.transform.scale(pygame.image.load('assets/player.png'), gc.playerSize)
-        self.moveX = 6
-        self.moveY = 20
-        self.magicBar = attackCooldown(100)  # Max Capacity
+        self.magicBar = attackCooldown(self.data.maxCapacityMagicBar)  # Max Capacity
+
         self.healthRect = pygame.Rect(self.rect.x, self.rect.y, 100, 5)
         self.enemy = None
         self.keys = pygame.key.get_pressed()
@@ -182,17 +189,17 @@ class player(combatEntity):
                     moveFr = False
 
         if self.keys[pygame.K_d] and moveFr:
-            self.rect.x += self.moveX
+            self.rect.x += self.data.moveX
             self.facing = True
         if self.keys[pygame.K_a] and moveBa:
-            self.rect.x -= self.moveX
+            self.rect.x -= self.data.moveX
             self.facing = False
         if self.keys[pygame.K_b]:
             self.blocking = True
         else:
             self.blocking = False
             if self.keys[pygame.K_SPACE] and not self.jumping:
-                self.velocity[1] -= self.moveY
+                self.velocity[1] -= self.data.moveY
                 self.jumping = True
 
     def eventHandle(self, event=None):
@@ -223,18 +230,18 @@ class player(combatEntity):
         # aType true means heavy attack false means light attack
         if self.facing and 0 < self.enemy.rect.x - self.rect.x < 100:
             if aType:
-                self.enemy.damage(20)
-                print('player: heavy')
+                self.enemy.damage(self.data.damage['heavy'])
+                print('[player]: heavy')
             else:
-                self.enemy.damage(10)
-                print('player light')
+                self.enemy.damage(self.data.damage['light'])
+                print('[player]: light')
         elif not self.facing and 0 > self.enemy.rect.x - self.rect.x > -100:
             if aType:
-                self.enemy.damage(20)
-                print('player: heavy')
+                self.enemy.damage(self.data.damage['heavy'])
+                print('[player]: heavy')
             else:
-                self.enemy.damage(10)
-                print('player light')
+                self.enemy.damage(self.data.damage['light'])
+                print('[player]: light')
 
     def dashAttack(self):
         self.tangible = False
@@ -259,13 +266,15 @@ class EnemyAI(combatEntity):
         self.walking = False
         self.invisibleRect = pygame.rect.Rect(self.rect.x - 50, self.rect.y, 225, gc.playerSize[1])
         self.player = None
+
         self.stunRect = pygame.rect.Rect(20, 50, (self.health / 100) * 600, 10)
         '''Get player'''
         for i in self.group[0]:
             if i != self:
                 self.player = i
                 break
-        self.healthBar = screenElements.healthBar(groups[1], MaxLevel=375, entity=self)
+        self.healthBar = screenElements.levelBar(groups[1], MaxLevel=375, entity=self, pos=(40, 10), size=(710, 20),
+                                                 colorScheme=(gc.color['RED'], gc.color['GREEN']))
 
     def update(self, *args, ):
         self.rect = self.rect.move(self.velocity)
@@ -351,7 +360,7 @@ class EnemyAI(combatEntity):
         elif not self.player.blocking:  # TODO: Add player stun
             self.tangible = False
             self.moveInDirection(not self.facing, 30)
-            self.player.damage(30, 10)
+            self.player.damage(30, 0)
             print('[Enemy]: Heavy Attack')
 
     def attackPlayerLight(self):
@@ -360,7 +369,7 @@ class EnemyAI(combatEntity):
             return
         elif not self.player.blocking:
             self.moveInDirection(not self.facing)
-            self.player.damage(30, 5)
+            self.player.damage(30, 0)
             print('[Enemy]: Light Attack')
 
     def slowDown(self):
@@ -381,7 +390,7 @@ class EnemyAI(combatEntity):
         else:
             return x_, y_
 
-    def damage(self, hit, stun):
+    def damage(self, hit, stun=0):
         super(EnemyAI, self).damage(hit, stun)
         if random.randint(0, 120) == 1:
             collectibles.healthBoost(self.group, floor=self.platform, pos=(self.rect.x, self.rect.y),
