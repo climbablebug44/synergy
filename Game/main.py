@@ -1,8 +1,8 @@
 import datetime
 import traceback
-from CombatSystem.combatGame import combatGame
-from CombatSystem import gameConstants as gc
-from Screens.game import Game as gameScreen
+from Game.CombatSystem.combatGame import combatGame
+from Game.CombatSystem import gameConstants as gc
+from Game.Screens.game import Game as gameScreen
 import pygame
 
 if __name__ == '__main__':
@@ -29,6 +29,7 @@ if __name__ == '__main__':
 
     except Exception as ex:
         a = traceback.format_exc()
+        print(a)
         FP = open("CombatSystem/log.txt", "a")
         FP.write("[" + str(datetime.datetime.now()) + "]\n" + a + "\n\n")
         exit(1)
