@@ -138,7 +138,7 @@ class player(combatEntity):
         self.enemy = None
         self.keys = pygame.key.get_pressed()
         self.mouse = pygame.mouse.get_pressed()
-        self.attacks = [self.dashAttack, self.rushAttack, self.whirlWindStrike, self.magicWeapon]
+        self.attacks = [self.dashAttack, self.chargedAttack, self.whirlWindStrike, self.magicWeapon]
         self.slot = 0
         self.dashing = False
         # Call an attack: self.attacks[i]()
@@ -148,6 +148,7 @@ class player(combatEntity):
         self.healthRect = pygame.Rect(self.rect.x, self.rect.y - 10, self.health // 5, 5)
 
     def update(self):
+        print(self.magicBar.currentLevel())
         self.rect = self.rect.move(self.velocity)
         # remove this later
         self.health = 100
@@ -159,7 +160,7 @@ class player(combatEntity):
         self.updateHealthBar()
 
         '''Magic Bar fills'''
-        self.magicBar.increase(1, 100)
+        self.magicBar.increase(1, 200)
 
         if self.velocity[0] == 0:
             self.movement()
@@ -215,8 +216,10 @@ class player(combatEntity):
             '''Change - Slot'''
             if event.key == pygame.K_w:
                 self.slot = (self.slot + 1) % 4
+                print(self.slot)
             elif event.key == pygame.K_s:
                 self.slot = (self.slot - 1) % 4
+                print(self.slot)
         if event.type == pygame.MOUSEBUTTONDOWN:
             # Bullet
             if self.mouse[2]:
@@ -244,15 +247,26 @@ class player(combatEntity):
                 print('[player]: light')
 
     def dashAttack(self):
-        self.tangible = False
-        self.dashing = True
-        self.velocity[0] = (lambda x: 20 if x else -20)(self.facing)
+        if self.magicBar.currentLevel() >= 30:
+            self.tangible = False
+            self.dashing = True
+            self.velocity[0] = (lambda x: 20 if x else -20)(self.facing)
+            self.magicBar.decrease(30)
 
-    def rushAttack(self):
-        pass
+    def chargedAttack(self):
+        if self.magicBar.currentLevel() >= 40:
+            if abs(self.rect.x - self.enemy.rect.x) < 100:
+                self.enemy.damage(self.data.damage['heavy'] * 2)
+            print('[Player]: Charged Attack Success')
+            self.magicBar.decrease(40)
 
     def whirlWindStrike(self):
-        pass
+        if self.magicBar.currentLevel() >= 30:
+            for i in self.group[0]:
+                if isinstance(i, EnemyAI) and abs(self.rect.x - i.rect.x) < 150:
+                    i.damage(self.data.damage['heavy'], self.data.stun['light'])
+            print('[Player]: Whirl Wind Attack Success')
+            self.magicBar.decrease(30)
 
     def magicWeapon(self):
         pass
