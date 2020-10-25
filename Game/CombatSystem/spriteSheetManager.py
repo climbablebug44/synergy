@@ -16,7 +16,7 @@ class spriteSheetManager(object):
 
     @staticmethod
     def get(filename, direction):
-        spriteSheet = pygame.image.load('CombatSystem/assets/' + filename).convert()
+        spriteSheet = pygame.image.load(filename).convert()
         with open('CombatSystem/assets/spriteData.pkl', 'rb') as inp:
             spriteDataDict = pickle.load(inp)[filename]
         colorKey = spriteDataDict[0]
@@ -38,7 +38,7 @@ class spriteSheetManager(object):
 
     @staticmethod
     def getOther(filename, colorKey, size, noOfSprites, sizeOut, direction):
-        spriteSheet = pygame.image.load('CombatSystem/assets/' + filename).convert()
+        spriteSheet = pygame.image.load(filename).convert()
         imageList = []
         for l in range(noOfSprites):
             image = pygame.Surface(size).convert()
