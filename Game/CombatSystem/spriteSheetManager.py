@@ -16,8 +16,8 @@ class spriteSheetManager(object):
 
     @staticmethod
     def get(filename, direction):
-        spriteSheet = pygame.image.load('assets/' + filename).convert()
-        with open('../assets/spriteData.pkl', 'rb') as inp:
+        spriteSheet = pygame.image.load('CombatSystem/assets/' + filename).convert()
+        with open('CombatSystem/assets/spriteData.pkl', 'rb') as inp:
             spriteDataDict = pickle.load(inp)[filename]
         colorKey = spriteDataDict[0]
         h_w = spriteDataDict[1]
@@ -34,6 +34,21 @@ class spriteSheetManager(object):
                 imageList.append(pygame.transform.scale(image, size))
             else:
                 imageList.append(pygame.transform.flip(pygame.transform.scale(image, size), True, False))
+        return imageList
+
+    @staticmethod
+    def getOther(filename, colorKey, size, noOfSprites, sizeOut, direction):
+        spriteSheet = pygame.image.load('CombatSystem/assets/' + filename).convert()
+        imageList = []
+        for l in range(noOfSprites):
+            image = pygame.Surface(size).convert()
+            image.convert_alpha()
+            image.blit(spriteSheet, (0, 0), (size[0] * l, 0, size[0], size[1]))
+            image.set_colorkey(colorKey)
+            if direction:
+                imageList.append(pygame.transform.scale(image, sizeOut))
+            else:
+                imageList.append(pygame.transform.flip(pygame.transform.scale(image, sizeOut), True, False))
         return imageList
 
 
