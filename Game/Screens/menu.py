@@ -93,6 +93,7 @@ class OptionsMenu(Menu):
         self.volx, self.voly = self.mid_w, self.mid_h + 20
         self.controlsx, self.controlsy = self.mid_w, self.mid_h + 45
         self.cursor_rect.midtop = (self.volx + self.offset, self.voly)
+        self.x,self.y,self.z,self.l,self.m,self.n,self.b,self.v,self.o,self.g='W','S','A','D','P','C','U','I','Space','Q'
 
     def display_menu(self):
         self.run_display = True
