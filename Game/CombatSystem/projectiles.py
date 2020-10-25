@@ -1,5 +1,6 @@
 import pygame
 from Game.CombatSystem import playerEntity
+from Game.CombatSystem import gameConstants as gc
 
 
 class projectiles(pygame.sprite.Sprite):
@@ -11,7 +12,8 @@ class projectiles(pygame.sprite.Sprite):
         pass
 
     def update(self, *args):
-        pass
+        if self.rect.x > gc.screenSize[0] or self.rect.x < 0 or self.rect.y < 0 or self.rect.y > gc.screenSize[1]:
+            self.kill()
 
 
 class bullets(projectiles):
@@ -25,15 +27,13 @@ class bullets(projectiles):
 
     def update(self, *args):
         self.rect = self.rect.move(self.velocity)
-        if self.rect.x > 800 or self.rect.x < 0 or self.rect.y < 0 or self.rect.y > 600:
-            self.kill()
-
         for i in self.group:
             if i != self.creator and i != self and i.rect.colliderect(self.rect):
                 if isinstance(i, playerEntity.combatEntity):
                     '''Reducing health'''
                     i.damage(10, 5)
                     self.kill()
+        super(bullets, self).update()
 
 
 class forceField(projectiles):
@@ -58,3 +58,4 @@ class forceField(projectiles):
                     i.velocity[0] = -self.pushvel
                 i.damage(self.damage, 20)
                 self.kill()
+        super(forceField, self).update()
