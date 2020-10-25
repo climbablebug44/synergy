@@ -22,12 +22,18 @@ class combatGame(object):
         self.state = self.mainLoop()
 
     def constructBackground(self):
-        # self.allSprites.add(backgroundElements)
         """
+        Code for Drawing the background
+        # bg = self.sSManager.getOther('assets/bg.png', (size of image as tuple (x,y)), 1, (size of out required as tuple(x,y), True)
+        # bgSprite = pygame.sprite.Sprite()
+        # bgSprite.image = bg[0]
+        # bgSprite.rect = bgSprite.image.get_rect()
+        # self.allSprites.add(bgSprite)"""
+        '''
             For many sprites that have different positions but same image, blitting saves more space and makes more
             sense.
             TODO: blit other background elements
-        """
+        '''
         grassblock = pygame.transform.scale(pygame.image.load('assets/grass.png'), (80, 80))
         for i in range(20):
             self.screen.blit(grassblock, ((80 * i), c.screenSize[1] - 30))
