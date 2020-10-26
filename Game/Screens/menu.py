@@ -142,7 +142,7 @@ class OptionsMenu(Menu):
             self.game.draw_text('Backspace',15,205,290)
             self.game.draw_text('Quit',15,220,320)
             self.game.window.blit(self.game.display, (0, 0))
-            
+            self.Change_controls()
             mouse =pygame.mouse.get_pos()
             smallfont = pygame.font.SysFont('Corbel',18) 
             text = smallfont.render(self.x , True , [255,255,255])
@@ -219,7 +219,6 @@ class OptionsMenu(Menu):
                 pygame.draw.rect(self.game.window,[128,123,200],[255,310,65,16])
             
             self.game.window.blit(text,(280,310)) 
-            self.Change_controls()
             pygame.display.update()   
             
     def Change_controls(self):
@@ -231,7 +230,83 @@ class OptionsMenu(Menu):
                 if ev.type == pygame.MOUSEBUTTONDOWN:
                    
                     if(255<=mouse[0]<=320 and 40 <=mouse[1]<=56):
-                        print 
+                        if(255<=mouse[0]<=320 and 40 <=mouse[1]<=56):
+                        while True:
+                            x = pygame.event.get(pygame.KEYDOWN)
+                            if len(x)>0:
+                                key = x[0].key
+                                break
+                        self.x = chr(key).upper()
+                        
+                    if(255<=mouse[0]<=320 and 70 <=mouse[1]<=86):
+                        while True:
+                            x = pygame.event.get(pygame.KEYDOWN)
+                            if len(x)>0:
+                                key = x[0].key
+                                break
+                        self.y = chr(key).upper()
+                        
+                    if(255<=mouse[0]<=320 and 100 <=mouse[1]<=116):
+                        while True:
+                            x = pygame.event.get(pygame.KEYDOWN)
+                            if len(x)>0:
+                                key = x[0].key
+                                break
+                        self.z = chr(key).upper()
+                        
+                    if(255<=mouse[0]<=320 and 130 <=mouse[1]<=146):
+                        while True:
+                            x = pygame.event.get(pygame.KEYDOWN)
+                            if len(x)>0:
+                                key = x[0].key
+                                break
+                        self.l= chr(key).upper()
+                    if(255<=mouse[0]<=320 and 160 <=mouse[1]<=176):
+                        while True:
+                            x = pygame.event.get(pygame.KEYDOWN)
+                            if len(x)>0:
+                                key = x[0].key
+                                break
+                        self.m = chr(key).upper()
+                    if(255<=mouse[0]<=320 and 190 <=mouse[1]<=206):
+                        while True:
+                            x = pygame.event.get(pygame.KEYDOWN)
+                            if len(x)>0:
+                                key = x[0].key
+                                break
+                        self.n = chr(key).upper()  
+                    if(255<=mouse[0]<=320 and 220 <=mouse[1]<=236):
+                       while True:
+                           x = pygame.event.get(pygame.KEYDOWN)
+                           if len(x)>0:
+                               key = x[0].key
+                               break
+                       self.b = chr(key).upper()
+                       
+                    if(255<=mouse[0]<=320 and 250 <=mouse[1]<=266):
+                       while True:
+                           x = pygame.event.get(pygame.KEYDOWN)
+                           if len(x)>0:
+                               key = x[0].key
+                               break
+                       self.v = chr(key).upper()  
+                       
+                    if(255<=mouse[0]<=320 and 280 <=mouse[1]<=296):
+                       while True:
+                           x = pygame.event.get(pygame.KEYDOWN)
+                           if len(x)>0:
+                               key = x[0].key
+                               break
+                       self.o = chr(key).upper()  
+                       
+                    if(255<=mouse[0]<=320 and 310 <=mouse[1]<=326):
+                       while True:
+                           x = pygame.event.get(pygame.KEYDOWN)
+                           if len(x)>0:
+                               key = x[0].key
+                               break
+                       self.g = chr(key).upper()
+                        
 
 class CreditsMenu(Menu):
     def __init__(self, game):
