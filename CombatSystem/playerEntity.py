@@ -1,6 +1,6 @@
 import pygame
 import random
-from Game.CombatSystem import projectiles, collectibles, gameConstants as gc, screenElements, currentConfigurations
+from CombatSystem import projectiles, collectibles, gameConstants as gc, screenElements, currentConfigurations
 
 
 class deltaTime:

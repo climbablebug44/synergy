@@ -1,8 +1,8 @@
 import datetime
 import traceback
-from Game.CombatSystem.combatGame import combatGame
-from Game.CombatSystem import gameConstants as gc
-from Game.Screens.game import Game as gameScreen
+from CombatSystem.combatGame import combatGame
+from CombatSystem import gameConstants as gc
+from Screens.game import Game as gameScreen
 import pygame
 
 if __name__ == '__main__':
