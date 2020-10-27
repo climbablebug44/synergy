@@ -163,10 +163,9 @@ class player(combatEntity):
         self.healthRect = pygame.Rect(self.rect.x, self.rect.y - 10, self.health // 5, 5)
 
     def update(self):
-        # print(self.magicBar.currentLevel())
         self.rect = self.rect.move(self.velocity)
-        # remove this later
-        self.health = 100
+        '''# remove this later
+        self.health = 100'''
         if self.enemy is None:
             for i in self.group[0]:
                 if i != self and isinstance(i, EnemyAI):
@@ -232,7 +231,7 @@ class player(combatEntity):
                 projectiles.forceField(self.group[1], creator=self, direction=self.facing)
                 projectiles.forceField(self.group[1], creator=self, direction=not self.facing)
                 self.magicBar.decrease(20)
-            if self.keys[self.keyBindings[8]]:
+            if self.keys[self.keyBindings[8]] and self.bulletCount == 0:
                 self.bulletCount = self.data.gunSlots
             if self.data.autoAim and self.keys[self.keyBindings[11]] and self.bulletCount > 0:
                 projectiles.bullets(self.group[1], creator=self,
