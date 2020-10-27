@@ -144,7 +144,7 @@ class OptionsMenu(Menu):
             self.game.draw_text('Backspace', 15, 205, 290)
             self.game.draw_text('Speed Up',15,210,320)
             self.game.draw_text('Fire ',15,230,350)
-            self.game.draw_text('Quit', 15, 220, 320)
+            self.game.draw_text('Quit', 15, 220, 380)
             self.game.window.blit(self.game.display, (0, 0))
             self.Change_controls()
             mouse = pygame.mouse.get_pos()
