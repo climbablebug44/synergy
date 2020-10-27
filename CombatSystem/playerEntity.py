@@ -146,6 +146,7 @@ class player(combatEntity):
         '''
         playerConfig = currentConfigurations.playerConfig('player.pkl')
         self.data = playerConfig.read()
+        self.bulletCount = self.data.gunSlots
         self.image = pygame.transform.scale(pygame.image.load('assets/player.png'), gc.playerSize)
         self.magicBar = attackCooldown(self.data.maxCapacityMagicBar)  # Max Capacity
         self.healthRect = pygame.Rect(self.rect.x, self.rect.y, 100, 5)
@@ -231,9 +232,12 @@ class player(combatEntity):
                 projectiles.forceField(self.group[1], creator=self, direction=self.facing)
                 projectiles.forceField(self.group[1], creator=self, direction=not self.facing)
                 self.magicBar.decrease(20)
-            if self.data.autoAim and self.keys[self.keyBindings[11]]:
+            if self.keys[self.keyBindings[8]]:
+                self.bulletCount = self.data.gunSlots
+            if self.data.autoAim and self.keys[self.keyBindings[11]] and self.bulletCount > 0:
                 projectiles.bullets(self.group[1], creator=self,
                                     vel=(self.transform((self.enemy.rect.x, self.enemy.rect.y), 30.0)))
+                self.bulletCount -= 1
             '''Change - Slot'''
             if event.key == self.keyBindings[5]:
                 self.slot = (self.slot + 1) % 4
@@ -243,8 +247,9 @@ class player(combatEntity):
                 print(self.slot)
         if event.type == pygame.MOUSEBUTTONDOWN:
             # Bullet
-            if self.mouse[2] and not self.data.autoAim:
+            if self.mouse[2] and not self.data.autoAim and self.bulletCount > 0:
                 projectiles.bullets(self.group[1], creator=self, vel=(self.transform(pygame.mouse.get_pos(), 30.0)))
+                self.bulletCount -= 1
 
     def meleeAttack(self, aType: bool):
         # aType true means heavy attack false means light attack
