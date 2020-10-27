@@ -10,15 +10,9 @@ class playCombatConfig:
         self.maxCapacityMagicBar = 100
         self.moveX = 6
         self.moveY = 20
-        self.damage = {
-            'light': 10,
-            'heavy': 30
-        }
-        self.stun = {
-            'light': 5,
-            'heavy': 10
-        }
-        self.defaultVel = 30
+        self.damageMultiplier = 1
+        self.stunMultiplier = 1
+        self.autoAim = True
         self.difficulty = 1
         # 1 is the lowest, 10 is highest
 
