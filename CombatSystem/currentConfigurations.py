@@ -14,6 +14,7 @@ class playCombatConfig:
         self.stunMultiplier = 1
         self.autoAim = True
         self.difficulty = 1
+        self.gunSlots = 6
         # 1 is the lowest, 10 is highest
 
 
