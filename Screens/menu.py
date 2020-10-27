@@ -94,7 +94,7 @@ class OptionsMenu(Menu):
         self.controlsx, self.controlsy = self.mid_w, self.mid_h + 45
         self.cursor_rect.midtop = (self.volx + self.offset, self.voly)
         # self.x, self.y, self.z, self.l, self.m, self.n, self.b, self.v, self.o, self.g = 'W', 'S', 'A', 'D', 'P', 'C', 'U', 'I', 'Space', 'Q'
-        self.keys = ['W', 'S', 'A', 'D', 'P', 'C', 'U', 'I', 'Space', 'Q']
+        self.keys = ['W', 'S', 'A', 'D', 'P', 'C', 'U', 'I', 'Space','E','B','Q','Done']
 
     def display_menu(self):
         self.run_display = True
@@ -142,6 +142,8 @@ class OptionsMenu(Menu):
             self.game.draw_text('Cam Up', 15, 210, 230)
             self.game.draw_text('Side Cam', 15, 210, 260)
             self.game.draw_text('Backspace', 15, 205, 290)
+            self.game.draw_text('Speed Up',15,210,320)
+            self.game.draw_text('Fire ',15,230,350)
             self.game.draw_text('Quit', 15, 220, 320)
             self.game.window.blit(self.game.display, (0, 0))
             self.Change_controls()
@@ -219,8 +221,28 @@ class OptionsMenu(Menu):
                 pygame.draw.rect(self.game.window, [120, 209, 147], [255, 310, 65, 16])
             else:
                 pygame.draw.rect(self.game.window, [128, 123, 200], [255, 310, 65, 16])
-
             self.game.window.blit(text, (280, 310))
+            
+            text = smallfont.render(self.keys[10], True, [255, 255, 255])
+            if 255 <= mouse[0] <= 320 and 340 <= mouse[1] <= 356:
+                pygame.draw.rect(self.game.window, [120, 209, 147], [255, 340, 65, 16])
+            else:
+                pygame.draw.rect(self.game.window, [128, 123, 200], [255, 340, 65, 16])
+            self.game.window.blit(text, (280, 340))
+
+            text = smallfont.render(self.keys[11], True, [255, 255, 255])
+            if 255 <= mouse[0] <= 320 and 370 <= mouse[1] <= 396:
+                pygame.draw.rect(self.game.window, [120, 209, 147], [255, 370, 65, 16])
+            else:
+                pygame.draw.rect(self.game.window, [128, 123, 200], [255, 370, 65, 16])
+            self.game.window.blit(text, (280, 370))
+            
+            text = smallfont.render(self.keys[12], True, [255, 255, 255])
+            if 255 <= mouse[0] <= 330 and 450 <= mouse[1] <= 476:
+                pygame.draw.rect(self.game.window, [163, 114, 202], [255, 450, 85, 26])
+            else:
+                pygame.draw.rect(self.game.window, [182, 134, 135], [255, 450, 85, 26])
+            self.game.window.blit(text, (280, 455))
             pygame.display.update()
 
     def Change_controls(self):
@@ -251,6 +273,12 @@ class OptionsMenu(Menu):
                     self.keys[8] = self.getKeyPress()
                 if 255 <= mouse[0] <= 320 and 310 <= mouse[1] <= 326:
                     self.keys[9] = self.getKeyPress()
+                if 255 <= mouse[0] <= 320 and 340 <= mouse[1] <= 356:
+                    self.keys[10] = self.getKeyPress()
+                if 255 <= mouse[0] <= 320 and 370 <= mouse[1] <= 386:
+                    self.keys[11] = self.getKeyPress()    
+                if 255 <= mouse[0] <= 330 and 450 <= mouse[1] <= 476:
+                    self.display_menu()
                 '''Checks no two functions have same keys'''
                 if len(self.keys) != len(set(self.keys)):
                     print('invalid binding')
