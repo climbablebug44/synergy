@@ -127,13 +127,27 @@ class combatEntity(pygame.sprite.Sprite):
 class player(combatEntity):
     def __init__(self, *groups, ssmanager, platform, time):
         super().__init__(*groups, ssmanager=ssmanager, platform=platform, time=time)
-
+        self.keyBindings = [pygame.K_a, pygame.K_d, pygame.K_b, pygame.K_q, pygame.K_e, pygame.K_w, pygame.K_s,
+                            pygame.K_SPACE, pygame.K_r, pygame.K_f, pygame.K_t, pygame.K_z]
+        '''
+        keybinding help: 
+        [0] : Walk-Left
+        [1] : Walk-right
+        [2] : Block
+        [3] : Light attack
+        [4] : Heavy attack
+        [5], [6] : slot-toggle
+        [7] : jump
+        [8] : Reload
+        [9] : special
+        [10]: magic push
+        [11]: auto-aim-shoot
+        ~[12]: toggle auto aim
+        '''
         playerConfig = currentConfigurations.playerConfig('player.pkl')
         self.data = playerConfig.read()
-
         self.image = pygame.transform.scale(pygame.image.load('assets/player.png'), gc.playerSize)
         self.magicBar = attackCooldown(self.data.maxCapacityMagicBar)  # Max Capacity
-
         self.healthRect = pygame.Rect(self.rect.x, self.rect.y, 100, 5)
         self.enemy = None
         self.keys = pygame.key.get_pressed()
@@ -148,7 +162,7 @@ class player(combatEntity):
         self.healthRect = pygame.Rect(self.rect.x, self.rect.y - 10, self.health // 5, 5)
 
     def update(self):
-        print(self.magicBar.currentLevel())
+        # print(self.magicBar.currentLevel())
         self.rect = self.rect.move(self.velocity)
         # remove this later
         self.health = 100
@@ -189,61 +203,64 @@ class player(combatEntity):
                 elif self.rect.x < self.enemy.rect.x:
                     moveFr = False
 
-        if self.keys[pygame.K_d] and moveFr:
-            self.rect.x += self.data.moveX
-            self.facing = True
-        if self.keys[pygame.K_a] and moveBa:
-            self.rect.x -= self.data.moveX
-            self.facing = False
-        if self.keys[pygame.K_b]:
+        if self.keys[self.keyBindings[2]]:
+            x = 2
             self.blocking = True
         else:
+            x = 1
             self.blocking = False
-            if self.keys[pygame.K_SPACE] and not self.jumping:
+            if self.keys[self.keyBindings[7]] and not self.jumping:
                 self.velocity[1] -= self.data.moveY
                 self.jumping = True
+            if self.keys[self.keyBindings[9]]:
+                self.attacks[self.slot]()
+
+        if self.keys[self.keyBindings[1]] and moveFr:
+            self.rect.x += self.data.moveX // x
+            self.facing = True
+        if self.keys[self.keyBindings[0]] and moveBa:
+            self.rect.x -= self.data.moveX // x
+            self.facing = False
 
     def eventHandle(self, event=None):
         self.keys = pygame.key.get_pressed()
         self.mouse = pygame.mouse.get_pressed()
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_p and self.magicBar.currentLevel() >= 20:
+            if event.key == self.keyBindings[10] and self.magicBar.currentLevel() >= 20:
                 # Force Field
                 projectiles.forceField(self.group[1], creator=self, direction=self.facing)
                 projectiles.forceField(self.group[1], creator=self, direction=not self.facing)
                 self.magicBar.decrease(20)
-
+            if self.data.autoAim and self.keys[self.keyBindings[11]]:
+                projectiles.bullets(self.group[1], creator=self,
+                                    vel=(self.transform((self.enemy.rect.x, self.enemy.rect.y), 30.0)))
             '''Change - Slot'''
-            if event.key == pygame.K_w:
+            if event.key == self.keyBindings[5]:
                 self.slot = (self.slot + 1) % 4
                 print(self.slot)
-            elif event.key == pygame.K_s:
+            elif event.key == self.keyBindings[6]:
                 self.slot = (self.slot - 1) % 4
                 print(self.slot)
         if event.type == pygame.MOUSEBUTTONDOWN:
             # Bullet
-            if self.mouse[2]:
-                projectiles.bullets(self.group[1], creator=self,
-                                    vel=(self.transform(pygame.mouse.get_pos(), 30.0)))
-            elif self.mouse[0]:
-                # self.meleeAttack(True)s
-                self.attacks[self.slot]()
+            if self.mouse[2] and not self.data.autoAim:
+                projectiles.bullets(self.group[1], creator=self, vel=(self.transform(pygame.mouse.get_pos(), 30.0)))
 
     def meleeAttack(self, aType: bool):
         # aType true means heavy attack false means light attack
         if self.facing and 0 < self.enemy.rect.x - self.rect.x < 100:
             if aType:
-                self.enemy.damage(self.data.damage['heavy'])
+                self.enemy.damage(int(30 * self.data.damageMultiplier))
                 print('[player]: heavy')
             else:
-                self.enemy.damage(self.data.damage['light'])
+                self.enemy.damage(int(10 * self.data.damageMultiplier))
                 print('[player]: light')
         elif not self.facing and 0 > self.enemy.rect.x - self.rect.x > -100:
             if aType:
-                self.enemy.damage(self.data.damage['heavy'])
+                self.enemy.damage(int(30 * self.data.damageMultiplier))
                 print('[player]: heavy')
             else:
-                self.enemy.damage(self.data.damage['light'])
+                self.enemy.damage(int(10 * self.data.damageMultiplier))
                 print('[player]: light')
 
     def dashAttack(self):
@@ -256,7 +273,7 @@ class player(combatEntity):
     def chargedAttack(self):
         if self.magicBar.currentLevel() >= 40:
             if abs(self.rect.x - self.enemy.rect.x) < 100:
-                self.enemy.damage(self.data.damage['heavy'] * 2)
+                self.enemy.damage(int(30 * self.data.damageMultiplier) * 2)
             print('[Player]: Charged Attack Success')
             self.magicBar.decrease(40)
 
@@ -264,7 +281,7 @@ class player(combatEntity):
         if self.magicBar.currentLevel() >= 30:
             for i in self.group[0]:
                 if isinstance(i, EnemyAI) and abs(self.rect.x - i.rect.x) < 150:
-                    i.damage(self.data.damage['heavy'], self.data.stun['light'])
+                    i.damage(int(30 * self.data.damageMultiplier), int(10 * self.data.stunMultiplier))
             print('[Player]: Whirl Wind Attack Success')
             self.magicBar.decrease(30)
 
