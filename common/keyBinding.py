@@ -1,9 +1,9 @@
 class temp:
   
-  self.keys = ['W', 'S', 'A', 'D', 'P', 'C', 'U', 'I', 'Space', 'E', 'B', 'Q', 'Done']
+  keys = ['W', 'S', 'A', 'D', 'P', 'C', 'U', 'I', 'Space', 'E', 'B', 'Q', 'Done']
   
   def __init__(self):
-    self.arr = self.keys
+    self.arr = temp.keys
   
   def funct1(self):
     file1 = open("file.txt",w+")
