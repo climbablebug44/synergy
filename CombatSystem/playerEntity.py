@@ -55,6 +55,8 @@ class combatEntity(pygame.sprite.Sprite):
     def __init__(self, *groups, ssmanager, platform, time):
         super().__init__(*groups)
         self.rect = pygame.Rect(0, 0, gc.playerSize[0], gc.playerSize[1])
+        # print(self.size[0], self.rect.width) # 75
+        # print(self.size[1], self.rect.height) # 150
         self.clock = time
         self.gravity = 1
         self.sSManager = ssmanager
@@ -88,9 +90,9 @@ class combatEntity(pygame.sprite.Sprite):
         if self.stunBar.currentLevel(0) and self.stunBar.time.delta(self.stunTime):
             self.stunBar.fill()
         ''' Gravity Code'''
-        if self.rect.colliderect(self.platform) and self.rect.y >= self.platform.y - gc.playerSize[1]:
+        if self.rect.colliderect(self.platform) and self.rect.y >= self.platform.y - self.rect.height:
             self.jumping = False
-            self.rect.y = self.platform.y - gc.playerSize[1]
+            self.rect.y = self.platform.y - self.rect.height
             self.velocity[1] = 0
         elif self.jumping:
             self.velocity[1] += self.gravity
@@ -99,8 +101,8 @@ class combatEntity(pygame.sprite.Sprite):
         '''L-R bounds'''
         if self.rect.x < 0:
             self.rect.x = 0
-        if self.rect.x > gc.screenSize[0] - gc.playerSize[0]:
-            self.rect.x = gc.screenSize[0] - gc.playerSize[0]
+        if self.rect.x > gc.screenSize[0] - self.rect.width:
+            self.rect.x = gc.screenSize[0] - self.rect.width
         '''/bounds'''
 
         if self.health <= 0:
@@ -147,9 +149,8 @@ class player(combatEntity):
         playerConfig = currentConfigurations.playerConfig('player.pkl')
         self.data = playerConfig.read()
         self.bulletCount = self.data.gunSlots
-        self.image = pygame.transform.scale(pygame.image.load('assets/player.png'), gc.playerSize)
+        self.image = pygame.transform.scale(pygame.image.load('assets/player.png'), self.rect.size)
         self.magicBar = attackCooldown(self.data.maxCapacityMagicBar)  # Max Capacity
-        self.healthRect = pygame.Rect(self.rect.x, self.rect.y, 100, 5)
         self.enemy = None
         self.keys = pygame.key.get_pressed()
         self.mouse = pygame.mouse.get_pressed()
@@ -157,10 +158,6 @@ class player(combatEntity):
         self.slot = 0
         self.dashing = False
         # Call an attack: self.attacks[i]()
-
-    def updateHealthBar(self):
-        del self.healthRect
-        self.healthRect = pygame.Rect(self.rect.x, self.rect.y - 10, self.health // 5, 5)
 
     def update(self):
         self.rect = self.rect.move(self.velocity)
@@ -171,7 +168,6 @@ class player(combatEntity):
                 if i != self and isinstance(i, EnemyAI):
                     self.enemy = i
                     break
-        self.updateHealthBar()
 
         '''Magic Bar fills'''
         self.magicBar.increase(1, 200)
@@ -299,21 +295,21 @@ class EnemyAI(combatEntity):
         self.image = pygame.transform.scale(pygame.image.load('assets/enemy.png'), (75, 150))
         self.rect.x = 500
         self.walking = False
-        self.invisibleRect = pygame.rect.Rect(self.rect.x - 50, self.rect.y, 225, gc.playerSize[1])
+        self.invisibleRect = pygame.rect.Rect(self.rect.x - 50, self.rect.y, 225, self.rect.height)
         self.player = None
-
-        self.stunRect = pygame.rect.Rect(20, 50, (self.health / 100) * 600, 10)
+        self.stunRect = screenElements.levelBar(self.group[1], MaxLevel=100, entity=self, pos=(80, 30),
+                                                colorScheme=(gc.color['RED'], gc.color['RED']), size=(60, 10))
+        self.healthBar = screenElements.levelBar(groups[1], MaxLevel=375, entity=self, pos=(40, 10), size=(710, 20),
+                                                 colorScheme=(gc.color['RED'], gc.color['GREEN']))
+        # self.stunRect = pygame.rect.Rect(20, 50, (self.health / 100) * 600, 10)
         '''Get player'''
         for i in self.group[0]:
             if i != self:
                 self.player = i
                 break
-        self.healthBar = screenElements.levelBar(groups[1], MaxLevel=375, entity=self, pos=(40, 10), size=(710, 20),
-                                                 colorScheme=(gc.color['RED'], gc.color['GREEN']))
 
     def update(self, *args, ):
         self.rect = self.rect.move(self.velocity)
-        self.stunRect = pygame.rect.Rect(70, 40, (self.stunBar.currentLevel() / 100) * 600, 5)
         '''Randomly Shoot towards player'''
         if not self.stunBar.currentLevel(0):
             if random.randint(0, 200) < 3:
@@ -321,7 +317,7 @@ class EnemyAI(combatEntity):
             if random.randint(0, 100) == 3:
                 self.walking = not self.walking
 
-            if self.rect.x > gc.screenSize[0] - 100 or self.rect.x < 100:
+            if self.rect.x > self.rect.width - 100 or self.rect.x < 100:
                 if random.randint(0, 1):
                     self.walking = False
                 else:
@@ -347,13 +343,13 @@ class EnemyAI(combatEntity):
             else:
                 self.moveInDirection(not self.facing)
 
-            self.invisibleRect.x, self.invisibleRect.y = self.rect.x - 75, self.rect.y
+            self.invisibleRect.x, self.invisibleRect.y = self.rect.x - self.rect.width, self.rect.y
             if self.tangible and self.player.tangible:
                 if self.rect.colliderect(self.player.rect):
                     if self.rect.x > self.player.rect.x:
-                        self.rect.x = self.player.rect.x + 75
+                        self.rect.x = self.player.rect.x + self.rect.width
                     else:
-                        self.rect.x = self.player.rect.x - 75
+                        self.rect.x = self.player.rect.x - self.rect.width
                     self.velocity[0] = 0
                     if random.randint(0, 10) == 3:
                         projectiles.forceField(self.group[1], creator=self, direction=self.facing, pushvel=25, damage=5)
@@ -436,7 +432,11 @@ class EnemyAI(combatEntity):
 class smallEnemy(EnemyAI):
     def __init__(self, *groups, ssmanager, platform, time):
         super().__init__(*groups, ssmanager=ssmanager, platform=platform, time=time)
-        pass
+        self.rect = pygame.rect.Rect(self.rect.x, self.rect.y, 50, 50)
+
+    def update(self, *args, ):
+        super(smallEnemy, self).update()
+        self.image = pygame.transform.scale(self.image, (50, 50))
 
 
 class smallFlyingEnemy(EnemyAI):
