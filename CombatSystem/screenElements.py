@@ -5,6 +5,7 @@ class levelBar(pygame.sprite.Sprite):
     def __init__(self, *groups, MaxLevel, entity, pos, size=(710, 20), colorScheme):
         super().__init__(*groups)
         self.maxLevel = MaxLevel
+        self.currLevel = MaxLevel
         self.image = pygame.Surface(size).convert()
         self.image.fill((0, 0, 0))
         self.colorScheme = colorScheme
@@ -13,8 +14,11 @@ class levelBar(pygame.sprite.Sprite):
         self.rect.x, self.rect.y = pos[0], pos[1]  # 40
         self.entity = entity
 
+    def changeCurrLevel(self, x):
+        self.currLevel = x
+
     def update(self):
-        currLevel = self.entity.health
+        currLevel = self.currLevel
         currLevel = int(700 * (currLevel / self.maxLevel))
         if currLevel > self.maxLevel // 5:
             color = self.colorScheme[1]

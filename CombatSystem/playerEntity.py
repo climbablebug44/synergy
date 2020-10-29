@@ -116,7 +116,7 @@ class combatEntity(pygame.sprite.Sprite):
 
     def eventHandle(self, event=None):
         """
-            Used in player class
+            will be overrided in player class
             to update only when an event occurs
             Has no use here
         """
@@ -154,6 +154,8 @@ class player(combatEntity):
         self.slot = 0
         self.dashing = False
         # Call an attack: self.attacks[i]()
+        # lock = is_locking, Entity locked to
+        self.lock = [self.data.autoAim, None]
 
     def update(self):
         self.rect = self.rect.move(self.velocity)
@@ -308,6 +310,8 @@ class EnemyAI(combatEntity):
 
     def update(self, *args, ):
         self.rect = self.rect.move(self.velocity)
+        self.healthBar.changeCurrLevel(self.health)
+        self.stunRect.changeCurrLevel(self.stunBar.currentLevel())
         '''Randomly Shoot towards player'''
         if not self.stunBar.currentLevel(0):
             if random.randint(0, 200) < 3:
