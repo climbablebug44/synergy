@@ -40,15 +40,16 @@ class spriteSheetManager(object):
     def getOther(filename, colorKey, size, noOfSprites, sizeOut, direction):
         spriteSheet = pygame.image.load(filename).convert()
         imageList = []
-        for l in range(noOfSprites):
-            image = pygame.Surface(size).convert()
+        for im in range(noOfSprites):
+            image = pygame.Surface(sizeOut).convert()
             image.convert_alpha()
-            image.blit(spriteSheet, (0, 0), (size[0] * l, 0, size[0], size[1]))
             image.set_colorkey(colorKey)
+            image.blit(spriteSheet, (-im * sizeOut[0], 0))
+
             if direction:
-                imageList.append(pygame.transform.scale(image, sizeOut))
+                imageList.append(image)
             else:
-                imageList.append(pygame.transform.flip(pygame.transform.scale(image, sizeOut), True, False))
+                imageList.append(pygame.transform.flip(image, True, False))
         return imageList
 
 
