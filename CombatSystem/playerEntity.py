@@ -61,19 +61,15 @@ class combatEntity(pygame.sprite.Sprite):
         self.gravity = 1
         self.sSManager = ssmanager
         self.velocity = [0, 0]
-        # data
         self.health = 375
-        # data
         self.jumping = True
         self.blocking = False
         self.facing = True
         self.tangible = True
         self.platform = platform
         self.group = groups
-        # data
         self.stunBar = attackCooldown(100)  # MAX Capacity, units
         self.stunTime = 1500  # ms
-        # data
 
     def transform(self, vect, vel):
         x = (vect[0] - self.rect.x) // 10
@@ -201,10 +197,12 @@ class player(combatEntity):
 
         if self.keys[self.keyBindings[2]]:
             x = 2
+            '''Walking slowly when blocking'''
             self.blocking = True
         else:
             x = 1
             self.blocking = False
+            ''' attack only when not blocking'''
             if self.keys[self.keyBindings[7]] and not self.jumping:
                 self.velocity[1] -= self.data.moveY
                 self.jumping = True
@@ -292,7 +290,7 @@ class player(combatEntity):
 class EnemyAI(combatEntity):
     def __init__(self, *groups, ssmanager, platform, time):
         super().__init__(*groups, ssmanager=ssmanager, platform=platform, time=time)
-        self.image = pygame.transform.scale(pygame.image.load('assets/enemy.png'), (75, 150))
+        self.image = pygame.transform.scale(pygame.image.load('assets/enemy.png'), self.rect.size)
         self.rect.x = 500
         self.walking = False
         self.invisibleRect = pygame.rect.Rect(self.rect.x - 50, self.rect.y, 225, self.rect.height)
@@ -433,9 +431,6 @@ class smallEnemy(EnemyAI):
     def __init__(self, *groups, ssmanager, platform, time):
         super().__init__(*groups, ssmanager=ssmanager, platform=platform, time=time)
         self.rect = pygame.rect.Rect(self.rect.x, self.rect.y, 50, 50)
-
-    def update(self, *args, ):
-        super(smallEnemy, self).update()
         self.image = pygame.transform.scale(self.image, (50, 50))
 
 
