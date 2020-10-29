@@ -33,7 +33,7 @@ class combatGame(object):
             sense.
             TODO: blit other background elements
         '''
-        bg = self.sSManager.getOther('assets/bg.png', (0,0,0) ,(2400, 600), 3, (800, 600), True)
+        bg = self.sSManager.getOther('assets/bg.png', (0,0,0) ,(2400, 600), 3, (2400, 600), True)
         self.screen.blit(bg[0], (0, 0))
 
     def pause(self):
