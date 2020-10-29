@@ -33,9 +33,8 @@ class combatGame(object):
             sense.
             TODO: blit other background elements
         '''
-        grassblock = pygame.transform.scale(pygame.image.load('assets/grass.png'), (80, 80))
-        for i in range(20):
-            self.screen.blit(grassblock, ((80 * i), c.screenSize[1] - 30))
+        bg = self.sSManager.getOther('assets/bg.png', (0,0,0) ,(2400, 600), 3, (800, 600), True)
+        self.screen.blit(bg[0], (0, 0))
 
     def pause(self):
         print('in pause')
