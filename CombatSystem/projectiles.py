@@ -28,7 +28,7 @@ class bullets(projectiles):
     def update(self, *args):
         self.rect = self.rect.move(self.velocity)
         for i in self.group:
-            if i != self.creator and i != self and i.rect.colliderect(self.rect):
+            if not isinstance(i, type(self.creator)) and i.rect.colliderect(self.rect):
                 if isinstance(i, playerEntity.combatEntity):
                     '''Reducing health'''
                     i.damage(10, 5)
