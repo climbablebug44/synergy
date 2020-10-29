@@ -147,7 +147,7 @@ class player(combatEntity):
         self.bulletCount = self.data.gunSlots
         self.image = pygame.transform.scale(pygame.image.load('assets/player.png'), self.rect.size)
         self.magicBar = attackCooldown(self.data.maxCapacityMagicBar)  # Max Capacity
-        self.enemy = None
+        self.enemy = []
         self.keys = pygame.key.get_pressed()
         self.mouse = pygame.mouse.get_pressed()
         self.attacks = [self.dashAttack, self.chargedAttack, self.whirlWindStrike, self.magicWeapon]
@@ -155,17 +155,17 @@ class player(combatEntity):
         self.dashing = False
         # Call an attack: self.attacks[i]()
         # lock = is_locking, Entity locked to
-        self.lock = [self.data.autoAim, None]
+        self.lockedEnemy = 0
+        self.lock = [self.data.autoAim, self.lockedEnemy]
 
     def update(self):
         self.rect = self.rect.move(self.velocity)
-        '''# remove this later
-        self.health = 100'''
-        if self.enemy is None:
-            for i in self.group[0]:
-                if i != self and isinstance(i, EnemyAI):
-                    self.enemy = i
-                    break
+        # remove this later
+        self.health = 100
+        for i in self.group[0]:
+            if i != self and isinstance(i, EnemyAI) and i not in self.enemy:
+                self.enemy.append(i)
+        # print(self.enemy)
 
         '''Magic Bar fills'''
         self.magicBar.increase(1, 200)
@@ -180,22 +180,24 @@ class player(combatEntity):
             else:
                 self.velocity[0] += 1
 
-        if self.dashing and self.rect.colliderect(self.enemy.rect):
-            self.enemy.damage(20, 5)
-            self.dashing = False
-            print('[Player]: Dash Special Attack Success')
+        for i in self.enemy:
+            if self.dashing and self.rect.colliderect(i):
+                i.damage(20, 5)
+                self.dashing = False
+                print('[Player]: Dash Special Attack Success')
 
         '''Super Call'''
         super(player, self).update()
 
     def movement(self):
         moveFr, moveBa = True, True
-        if self.tangible and self.enemy.tangible:
-            if self.enemy.rect.colliderect(self.rect):
-                if self.rect.x > self.enemy.rect.x:
-                    moveBa = False
-                elif self.rect.x < self.enemy.rect.x:
-                    moveFr = False
+        for i in self.enemy:
+            if self.tangible and i.tangible:
+                if i.rect.colliderect(self.rect):
+                    if self.rect.x > i.rect.x:
+                        moveBa = False
+                    elif self.rect.x < i.rect.x:
+                        moveFr = False
 
         if self.keys[self.keyBindings[2]]:
             x = 2
@@ -229,10 +231,18 @@ class player(combatEntity):
                 self.magicBar.decrease(20)
             if self.keys[self.keyBindings[8]] and self.bulletCount == 0:
                 self.bulletCount = self.data.gunSlots
-            if self.data.autoAim and self.keys[self.keyBindings[11]] and self.bulletCount > 0:
+            if self.lock[0] and self.keys[self.keyBindings[11]] and self.bulletCount > 0:
+                # TODO: DO changes here
                 projectiles.bullets(self.group[1], creator=self,
-                                    vel=(self.transform((self.enemy.rect.x, self.enemy.rect.y), 30.0)))
+                                    vel=(self.transform(
+                                        (self.enemy[self.lockedEnemy].rect.x, self.enemy[self.lockedEnemy].rect.y),
+                                        30.0)))
                 self.bulletCount -= 1
+            '''temp code'''
+            if event.key == pygame.K_c:
+                self.lockedEnemy = (self.lockedEnemy + 1) % len(self.enemy)
+                print(self.lockedEnemy)
+            '''temp code'''
             '''Change - Slot'''
             if event.key == self.keyBindings[5]:
                 self.slot = (self.slot + 1) % 4
@@ -242,26 +252,27 @@ class player(combatEntity):
                 print(self.slot)
         if event.type == pygame.MOUSEBUTTONDOWN:
             # Bullet
-            if self.mouse[2] and not self.data.autoAim and self.bulletCount > 0:
+            if self.mouse[2] and not self.lock[0] and self.bulletCount > 0:
                 projectiles.bullets(self.group[1], creator=self, vel=(self.transform(pygame.mouse.get_pos(), 30.0)))
                 self.bulletCount -= 1
 
     def meleeAttack(self, aType: bool):
         # aType true means heavy attack false means light attack
-        if self.facing and 0 < self.enemy.rect.x - self.rect.x < 100:
-            if aType:
-                self.enemy.damage(int(30 * self.data.damageMultiplier))
-                print('[player]: heavy')
-            else:
-                self.enemy.damage(int(10 * self.data.damageMultiplier))
-                print('[player]: light')
-        elif not self.facing and 0 > self.enemy.rect.x - self.rect.x > -100:
-            if aType:
-                self.enemy.damage(int(30 * self.data.damageMultiplier))
-                print('[player]: heavy')
-            else:
-                self.enemy.damage(int(10 * self.data.damageMultiplier))
-                print('[player]: light')
+        for i in self.enemy:
+            if self.facing and 0 < i.rect.x - self.rect.x < 100:
+                if aType:
+                    i.damage(int(30 * self.data.damageMultiplier))
+                    print('[player]: heavy')
+                else:
+                    i.damage(int(10 * self.data.damageMultiplier))
+                    print('[player]: light')
+            elif not self.facing and 0 > i.rect.x - self.rect.x > -100:
+                if aType:
+                    i.damage(int(30 * self.data.damageMultiplier))
+                    print('[player]: heavy')
+                else:
+                    i.damage(int(10 * self.data.damageMultiplier))
+                    print('[player]: light')
 
     def dashAttack(self):
         if self.magicBar.currentLevel() >= 30:
@@ -272,8 +283,9 @@ class player(combatEntity):
 
     def chargedAttack(self):
         if self.magicBar.currentLevel() >= 40:
-            if abs(self.rect.x - self.enemy.rect.x) < 100:
-                self.enemy.damage(int(30 * self.data.damageMultiplier) * 2)
+            # TODO: DO changes here
+            if abs(self.rect.x - self.enemy[self.lockedEnemy].rect.x) < 100:
+                self.enemy[self.lockedEnemy].damage(int(30 * self.data.damageMultiplier) * 2)
             print('[Player]: Charged Attack Success')
             self.magicBar.decrease(40)
 
@@ -307,6 +319,9 @@ class EnemyAI(combatEntity):
             if i != self:
                 self.player = i
                 break
+
+    def highlight(self):
+        pass
 
     def update(self, *args, ):
         self.rect = self.rect.move(self.velocity)
