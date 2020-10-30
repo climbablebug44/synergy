@@ -320,25 +320,22 @@ class EnemyAI(combatEntity):
                 self.player = i
                 break
 
-    def highlight(self):
-        pass
-
     def update(self, *args, ):
         self.rect = self.rect.move(self.velocity)
         self.healthBar.changeCurrLevel(self.health)
         self.stunRect.changeCurrLevel(self.stunBar.currentLevel())
         '''Randomly Shoot towards player'''
         if not self.stunBar.currentLevel(0):
-            if random.randint(0, 200) < 3:
+            if random.randint(0, 5000) < 3:
                 self.shootPlayer()
-            if random.randint(0, 100) == 3:
+            if random.randint(0, 1000) == 3:
                 self.walking = not self.walking
 
             if self.rect.x > self.rect.width - 100 or self.rect.x < 100:
-                if random.randint(0, 1):
-                    self.walking = False
-                else:
+                if random.randint(0, 20):
                     self.moveInDirection(not self.facing)
+                elif random.randint(0, 20):
+                    self.walking = False
 
             '''Orient Self facing towards player'''
             if self.player.rect.x > self.rect.x:
@@ -456,4 +453,30 @@ class smallEnemy(EnemyAI):
 class smallFlyingEnemy(EnemyAI):
     def __init__(self, *groups, ssmanager, platform, time):
         super().__init__(*groups, ssmanager=ssmanager, platform=platform, time=time)
-        pass
+        self.rect.y = 200
+        self.finalPos = 0
+        self.image = pygame.transform.scale(pygame.image.load('assets/bird.png'), (50, 50))
+        self.rect = self.image.get_rect()
+        self.player = None
+        for i in self.group[0]:
+            if i != self:
+                self.player = i
+                break
+        self.health = 50
+        if self.player is None:
+            self.kill()
+
+    def update(self, *args):
+        self.rect.y = 100
+        if self.rect.x != self.finalPos:
+            if self.rect.x < self.finalPos:
+                self.rect.x += 1
+            else:
+                self.rect.x -= 1
+        else:
+            self.finalPos = random.randint(10, 740)
+        if not random.randint(0, 50):
+            projectiles.bullets(self.group[1], creator=self,
+                                vel=self.transform((self.player.rect.x, self.player.rect.y), 30.0))
+        if self.health <= 0:
+            self.kill()
