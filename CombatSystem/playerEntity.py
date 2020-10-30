@@ -163,8 +163,15 @@ class player(combatEntity):
         # remove this later
         self.health = 100
         for i in self.group[0]:
-            if i != self and isinstance(i, EnemyAI) and i not in self.enemy:
-                self.enemy.append(i)
+            if i != self and isinstance(i, EnemyAI):
+                if i not in self.enemy:
+                    self.enemy.append(i)
+                elif i.health <= 0:
+                    try:
+                        self.enemy.remove(i)
+                        self.lockedEnemy = 0
+                    except ValueError:
+                        continue
         # print(self.enemy)
 
         '''Magic Bar fills'''

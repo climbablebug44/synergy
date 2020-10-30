@@ -82,11 +82,12 @@ class combatGame(object):
             self.constructBackground()  # Draws background
             self.allSprites.update()
 
-            pygame.draw.line(self.screen, (255, 0, 0), (
-                self.player.enemy[self.player.lockedEnemy].rect.x,
-                self.player.enemy[self.player.lockedEnemy].rect.y - 10),
-                             (self.player.enemy[self.player.lockedEnemy].rect.x - 10,
-                              self.player.enemy[self.player.lockedEnemy].rect.y - 10))
+            if self.player.lockedEnemy != 0:
+                pygame.draw.line(self.screen, (255, 0, 0), (
+                    self.player.enemy[self.player.lockedEnemy].rect.x,
+                    self.player.enemy[self.player.lockedEnemy].rect.y - 10),
+                                 (self.player.enemy[self.player.lockedEnemy].rect.x - 10,
+                                  self.player.enemy[self.player.lockedEnemy].rect.y - 10))
 
             self.allSprites.draw(self.screen)
             pygame.display.flip()
@@ -94,10 +95,11 @@ class combatGame(object):
 
             x = self.checkResult()
             if x is not None:
+                self.sSManager = None
                 return x
 
     def checkResult(self):
-        if self.enemy not in self.playingEntities:
+        if len(self.player.enemy) == 0:
             return True
         elif self.player not in self.playingEntities:
             return False
