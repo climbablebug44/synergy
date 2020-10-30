@@ -28,7 +28,9 @@ class combatGame(object):
     def constructBackground(self):
         """
                 Code for Drawing the background
-                # bg = self.sSManager.getOther('assets/bg.png(location of asset)', (size of image as tuple (x,y)), 1(number of sprites it has horizontally), (size of out required as tuple(x,y), True(False to flip(mirror image) ))
+                # bg = self.sSManager.getOther('assets/bg.png(location of asset)', (size of image as tuple (x,y)),
+                # 1(number of sprites it has horizontally), (size of out required as tuple(x,y),
+                # True(False to flip(mirror image) ))
                 # self.screen.blit(bg[0], (0, 0))
 
                 """

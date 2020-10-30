@@ -24,7 +24,6 @@ class collectibles(pygame.sprite.Sprite):
             self.velocity[0] -= 1
         elif self.velocity[0] < 0:
             self.velocity[0] += 1
-        print(self.rect.y)
         super(collectibles, self).update()
 
 
@@ -36,5 +35,4 @@ class healthBoost(collectibles):
         super(healthBoost, self).update()
         if self.rect.colliderect(self.player):
             self.player.damage(-100)
-            print('healed')
             self.kill()

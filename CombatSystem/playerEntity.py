@@ -335,14 +335,19 @@ class EnemyAI(combatEntity):
         if not self.stunBar.currentLevel(0):
             if random.randint(0, 5000) < 3:
                 self.shootPlayer()
-            if random.randint(0, 1000) == 3:
+            # print(self.walking)
+            if random.randint(0, 10) == 3:
                 self.walking = not self.walking
 
-            if self.rect.x > self.rect.width - 100 or self.rect.x < 100:
-                if random.randint(0, 20):
-                    self.moveInDirection(not self.facing)
-                elif random.randint(0, 20):
-                    self.walking = False
+            '''if self.rect.x > self.rect.width - 100 or self.rect.x < 100:
+                if self.walking and random.randint(0, 20):
+                    self.moveInDirection(random.randint(0, 1))'''
+            if self.rect.x < 100:
+                self.moveInDirection(False, 20)
+            if self.rect.x > 700:
+                self.moveInDirection(True, 20)
+                '''elif random.randint(0, 20):
+                    self.walking = False'''
 
             '''Orient Self facing towards player'''
             if self.player.rect.x > self.rect.x:
@@ -350,7 +355,7 @@ class EnemyAI(combatEntity):
             else:
                 self.facing = False
 
-            '''Check player too close'''
+            '''Check player too close - then attack'''
             if self.invisibleRect.colliderect(self.player.rect) and random.randint(0, 10) == 1:
                 x = random.randint(0, 100)
                 if x < 10:
@@ -458,32 +463,53 @@ class smallEnemy(EnemyAI):
 
 
 class smallFlyingEnemy(EnemyAI):
+    count = 0
+
+    # self-replicating Kind
+
     def __init__(self, *groups, ssmanager, platform, time):
         super().__init__(*groups, ssmanager=ssmanager, platform=platform, time=time)
         self.rect.y = 200
         self.finalPos = 0
         self.image = pygame.transform.scale(pygame.image.load('assets/bird.png'), (50, 50))
         self.rect = self.image.get_rect()
+        self.group = groups
         self.player = None
         for i in self.group[0]:
             if i != self:
                 self.player = i
                 break
+        self.replicate = deltaTime()
+        self.check = True
+        self.canReplicate = True
         self.health = 50
+        smallFlyingEnemy.count += 1
+        print(smallFlyingEnemy.count)
         if self.player is None:
             self.kill()
+            smallFlyingEnemy.count -= 1
 
     def update(self, *args):
+        if smallFlyingEnemy.count <= 20:
+            self.canReplicate = True
+        else:
+            self.canReplicate = False
+        if self.check and self.replicate.delta(10000) and self.canReplicate:
+            smallFlyingEnemy(*self.group, ssmanager=self.sSManager,
+                             platform=self.platform, time=self.clock)
+            self.check = False
+            self.replicate = None
         self.rect.y = 100
         if self.rect.x != self.finalPos:
             if self.rect.x < self.finalPos:
-                self.rect.x += 1
+                self.rect.x += 2
             else:
-                self.rect.x -= 1
+                self.rect.x -= 2
         else:
-            self.finalPos = random.randint(10, 740)
+            self.finalPos = random.randint(5, 370) * 2
         if not random.randint(0, 50):
             projectiles.bullets(self.group[1], creator=self,
                                 vel=self.transform((self.player.rect.x, self.player.rect.y), 30.0))
         if self.health <= 0:
             self.kill()
+            smallFlyingEnemy.count -= 1
