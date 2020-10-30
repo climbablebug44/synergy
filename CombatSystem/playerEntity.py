@@ -339,15 +339,15 @@ class EnemyAI(combatEntity):
             if random.randint(0, 10) == 3:
                 self.walking = not self.walking
 
-            '''if self.rect.x > self.rect.width - 100 or self.rect.x < 100:
-                if self.walking and random.randint(0, 20):
-                    self.moveInDirection(random.randint(0, 1))'''
-            if self.rect.x < 100:
+            '''if self.rect.x < 100:
                 self.moveInDirection(False, 20)
             if self.rect.x > 700:
-                self.moveInDirection(True, 20)
-                '''elif random.randint(0, 20):
-                    self.walking = False'''
+                self.moveInDirection(True, 20)'''
+            if self.rect.x > gc.screenSize[0] - 100 or self.rect.x < 100:
+                if random.randint(0, 1):
+                    self.walking = False
+                else:
+                    self.moveInDirection(not self.facing)
 
             '''Orient Self facing towards player'''
             if self.player.rect.x > self.rect.x:
