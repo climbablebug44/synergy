@@ -82,7 +82,7 @@ class combatGame(object):
             self.constructBackground()  # Draws background
             self.allSprites.update()
 
-            if self.player.lockedEnemy != 0:
+            if len(self.player.enemy) != 0:
                 pygame.draw.line(self.screen, (255, 0, 0), (
                     self.player.enemy[self.player.lockedEnemy].rect.x,
                     self.player.enemy[self.player.lockedEnemy].rect.y - 10),

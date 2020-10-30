@@ -1,6 +1,8 @@
 import pygame
 
 
+# TODO: THIS PART IS BROKEN
+
 class levelBar(pygame.sprite.Sprite):
     def __init__(self, *groups, MaxLevel, entity, pos, size=(710, 20), colorScheme):
         super().__init__(*groups)
