@@ -123,7 +123,7 @@ class OptionsMenu(Menu):
             elif self.state == 'Language':
                 self.state = 'Volume'
                 self.cursor_rect.midtop = (self.volx + self.offset, self.voly)
-        elif self.game.START_KEY:
+        elif self.game.START_KEY and self.state == 'Settings:
             # TO-DO: Create a Volume Menu and a Controls Menu
             self.control()
 
@@ -278,7 +278,9 @@ class OptionsMenu(Menu):
                 if 255 <= mouse[0] <= 320 and 370 <= mouse[1] <= 386:
                     self.keys[11] = self.getKeyPress()    
                 if 255 <= mouse[0] <= 330 and 450 <= mouse[1] <= 476:
-                    self.display_menu()
+                    self.game.BACK_KEY = True
+                    self.run_display = False
+                    self.game.display.fill(self.game.BLACK)
                 '''Checks no two functions have same keys'''
                 if len(self.keys) != len(set(self.keys)):
                     print('invalid binding')
