@@ -123,7 +123,7 @@ class OptionsMenu(Menu):
             elif self.state == 'Language':
                 self.state = 'Volume'
                 self.cursor_rect.midtop = (self.volx + self.offset, self.voly)
-        elif self.game.START_KEY and self.state == 'Settings:
+        elif self.game.START_KEY and self.state == 'Controls':
             # TO-DO: Create a Volume Menu and a Controls Menu
             self.control()
 
