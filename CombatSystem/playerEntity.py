@@ -1,3 +1,5 @@
+import math
+
 import pygame
 import random
 from CombatSystem import projectiles, collectibles, gameConstants as gc, screenElements, currentConfigurations
@@ -462,11 +464,7 @@ class smallEnemy(EnemyAI):
         self.image = pygame.transform.scale(self.image, (50, 50))
 
 
-class smallFlyingEnemy(EnemyAI):
-    count = 0
-
-    # self-replicating Kind
-
+class smallFlyingEnemySpawner(EnemyAI):
     def __init__(self, *groups, ssmanager, platform, time):
         super().__init__(*groups, ssmanager=ssmanager, platform=platform, time=time)
         self.rect.y = 200
@@ -480,36 +478,71 @@ class smallFlyingEnemy(EnemyAI):
                 self.player = i
                 break
         self.replicate = deltaTime()
-        self.check = True
-        self.canReplicate = True
-        self.health = 50
-        smallFlyingEnemy.count += 1
-        print(smallFlyingEnemy.count)
-        if self.player is None:
-            self.kill()
-            smallFlyingEnemy.count -= 1
+        self.health = 150
+        self.flip = False
 
     def update(self, *args):
-        if smallFlyingEnemy.count <= 20:
-            self.canReplicate = True
-        else:
-            self.canReplicate = False
-        if self.check and self.replicate.delta(10000) and self.canReplicate:
-            smallFlyingEnemy(*self.group, ssmanager=self.sSManager,
-                             platform=self.platform, time=self.clock)
-            self.check = False
-            self.replicate = None
-        self.rect.y = 100
+        if self.replicate.delta(5000) and smallFlyingEnemySpawned.count < 20:
+            smallFlyingEnemySpawned(*self.group, ssmanager=self.sSManager,
+                                    platform=self.platform, time=self.clock, x=self.rect.x)
+        self.rect.y = 100 + 5 * math.sin((pygame.time.get_ticks() % 43200) // 120)
         if self.rect.x != self.finalPos:
             if self.rect.x < self.finalPos:
                 self.rect.x += 2
+                if self.flip:
+                    self.image = pygame.transform.flip(self.image, True, False)
+                    self.flip = False
+
             else:
                 self.rect.x -= 2
+                if not self.flip:
+                    self.image = pygame.transform.flip(self.image, True, False)
+                    self.flip = True
+        else:
+            self.finalPos = random.randint(5, 370) * 2
+        if self.health <= 0:
+            self.kill()
+
+
+class smallFlyingEnemySpawned(EnemyAI):
+    count = 0
+
+    def __init__(self, *groups, ssmanager, platform, time, x):
+        super().__init__(*groups, ssmanager=ssmanager, platform=platform, time=time)
+        smallFlyingEnemySpawned.count += 1
+        self.finalPos = 0
+        self.image = pygame.transform.scale(pygame.image.load('assets/bird.png'), (50, 50))
+        self.rect = self.image.get_rect()
+        self.rect.y = 200
+        self.rect.x = x
+        self.group = groups
+        self.player = None
+        for i in self.group[0]:
+            if i != self:
+                self.player = i
+                break
+        self.health = 40
+        self.flip = False
+
+    def update(self, *args):
+        self.rect.y = 100 + 5 * math.sin((pygame.time.get_ticks() % 43200) // 120)
+        if self.rect.x != self.finalPos:
+            if self.rect.x < self.finalPos:
+                self.rect.x += 2
+                if self.flip:
+                    self.image = pygame.transform.flip(self.image, True, False)
+                    self.flip = False
+
+            else:
+                self.rect.x -= 2
+                if not self.flip:
+                    self.image = pygame.transform.flip(self.image, True, False)
+                    self.flip = True
         else:
             self.finalPos = random.randint(5, 370) * 2
         if not random.randint(0, 50):
             projectiles.bullets(self.group[1], creator=self,
                                 vel=self.transform((self.player.rect.x, self.player.rect.y), 30.0))
-        if self.health <= 0:
+        if self.health <= 0 or self.player is None:
+            smallFlyingEnemySpawned.count -= 1
             self.kill()
-            smallFlyingEnemy.count -= 1

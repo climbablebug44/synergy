@@ -5,7 +5,8 @@ from CombatSystem import gameConstants as gc
 from Screens.game import Game as gameScreen
 import pygame
 
-if __name__ == '__main__':
+
+def main():
     try:
         pygame.init()
         screen = pygame.display.set_mode(gc.screenSize)
@@ -33,3 +34,7 @@ if __name__ == '__main__':
         FP = open("CombatSystem/log.txt", "a")
         FP.write("[" + str(datetime.datetime.now()) + "]\n" + a + "\n\n")
         exit(1)
+
+
+if __name__ == '__main__':
+    main()

@@ -16,8 +16,9 @@ class combatGame(object):
                                           platform=self.platform, time=self.clock)
         self.enemy = playerEntity.EnemyAI(self.playingEntities, self.allSprites, ssmanager=self.sSManager,
                                           platform=self.platform, time=self.clock)
-        self.enemy2 = playerEntity.smallFlyingEnemy(self.playingEntities, self.allSprites, ssmanager=self.sSManager,
-                                                    platform=self.platform, time=self.clock)
+        self.enemy2 = playerEntity.smallFlyingEnemySpawner(self.playingEntities, self.allSprites,
+                                                           ssmanager=self.sSManager, platform=self.platform,
+                                                           time=self.clock)
         self.bg = self.sSManager.getOther('assets/bg.png', (0, 0, 0), (2400, 600), 3, (800, 600), True)
         self.running = True
 
