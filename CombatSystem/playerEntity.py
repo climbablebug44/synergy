@@ -145,26 +145,21 @@ class player(combatEntity):
         ~[12]: toggle auto aim
         [13]: toggle selected enemy
         '''
-        playerConfig = currentConfigurations.playerConfig('player.pkl')
-        self.data = playerConfig.read()
+        self.data = currentConfigurations.playerConfig('player.pkl').read()
+        self.keys = pygame.key.get_pressed()
+        self.mouse = pygame.mouse.get_pressed()
         self.bulletCount = self.data.gunSlots
         self.image = pygame.transform.scale(pygame.image.load('assets/player.png'), self.rect.size)
         self.magicBar = attackCooldown(self.data.maxCapacityMagicBar)  # Max Capacity
         self.enemy = []
-        self.keys = pygame.key.get_pressed()
-        self.mouse = pygame.mouse.get_pressed()
         self.attacks = [self.dashAttack, self.chargedAttack, self.whirlWindStrike, self.magicWeapon]
         self.slot = 0
         self.dashing = False
-        # Call an attack: self.attacks[i]()
-        # lock = is_locking, Entity locked to
         self.lockedEnemy = 0
         self.lock = [self.data.autoAim, self.lockedEnemy]
 
     def update(self):
         self.rect = self.rect.move(self.velocity)
-        # print(self.tangible, self.velocity[0])
-        # remove this later
         self.health = 100
         for i in self.group[0]:
             if i != self and isinstance(i, EnemyAI):
@@ -176,39 +171,34 @@ class player(combatEntity):
                         self.lockedEnemy = 0
                     except ValueError:
                         continue
-        # print(self.enemy)
-
-        '''Magic Bar fills'''
         self.magicBar.increase(1, 200)
-
-        if self.velocity[0] == 0:
+        if not self.velocity[0]:
             self.movement()
             self.tangible = True
             self.dashing = False
+        elif self.velocity[0] > 0:
+            self.velocity[0] -= 1
         else:
-            if self.velocity[0] > 0:
-                self.velocity[0] -= 1
-            else:
-                self.velocity[0] += 1
+            self.velocity[0] += 1
 
         for i in self.enemy:
             if self.dashing and self.rect.colliderect(i):
                 i.damage(20, 5)
                 self.dashing = False
                 print('[Player]: Dash Special Attack Success')
-
         '''Super Call'''
         super(player, self).update()
 
     def movement(self):
         moveFr, moveBa = True, True
-        for i in self.enemy:
-            if self.tangible and i.tangible:
-                if i.rect.colliderect(self.rect):
-                    if self.rect.x > i.rect.x:
-                        moveBa = False
-                    elif self.rect.x < i.rect.x:
-                        moveFr = False
+        if self.tangible:
+            for i in self.enemy:
+                if isinstance(i, EnemyAI) and i.tangible:
+                    if i.rect.colliderect(self.rect):
+                        if self.rect.x > i.rect.x:
+                            moveBa = False
+                        elif self.rect.x < i.rect.x:
+                            moveFr = False
 
         if self.keys[self.keyBindings[2]]:
             x = 2
@@ -221,8 +211,6 @@ class player(combatEntity):
             if self.keys[self.keyBindings[7]] and not self.jumping:
                 self.velocity[1] -= self.data.moveY
                 self.jumping = True
-            if self.keys[self.keyBindings[9]]:
-                self.attacks[self.slot]()
 
         if self.keys[self.keyBindings[1]] and moveFr:
             self.rect.x += self.data.moveX // x
@@ -258,6 +246,8 @@ class player(combatEntity):
                 self.lockedEnemy = (self.lockedEnemy + 1) % len(self.enemy)
                 print(self.lockedEnemy)
             '''temp code'''
+            if event.key == self.keyBindings[9]:
+                self.attacks[self.slot]()
             '''Change - Slot'''
             if event.key == self.keyBindings[5]:
                 self.slot = (self.slot + 1) % 4
@@ -298,7 +288,6 @@ class player(combatEntity):
 
     def chargedAttack(self):
         if self.magicBar.currentLevel() >= 40:
-            # TODO: DO changes here
             if abs(self.rect.x - self.enemy[self.lockedEnemy].rect.x) < 100:
                 self.enemy[self.lockedEnemy].damage(int(30 * self.data.damageMultiplier) * 2)
             print('[Player]: Charged Attack Success')
@@ -319,11 +308,11 @@ class player(combatEntity):
 class EnemyAI(combatEntity):
     def __init__(self, *groups, ssmanager, platform, time):
         super().__init__(*groups, ssmanager=ssmanager, platform=platform, time=time)
-        # self.image = pygame.transform.scale(pygame.image.load('assets/enemy.png'), self.rect.size)
-        self.idleAnimate = ssmanager.getOther('assets/Enemy-Dark_Wraith/idle.png', (0, 0, 0), (500, 100), 5, (200, 200),
-                                              True)
+        self.image = pygame.transform.scale(pygame.image.load('assets/enemy.png'), self.rect.size)
+        # self.idleAnimate = ssmanager.getOther('assets/Enemy-Dark_Wraith/idle.png', (0, 0, 0), (500, 100), 5,
+        # (200, 200), True)
         # somewhat working animation
-        self.image = self.idleAnimate[0]
+        # self.image = self.idleAnimate[0]
         self.i = 0
         self.rect.x = 500
         self.walking = False
@@ -341,8 +330,8 @@ class EnemyAI(combatEntity):
                 break
 
     def update(self, *args, ):
-        self.image = pygame.transform.flip(self.idleAnimate[self.i // 10], not self.facing, False)
-        self.i = (self.i + 1) % (10 * (len(self.idleAnimate) - 1))
+        # self.image = pygame.transform.flip(self.idleAnimate[self.i // 10], not self.facing, False)
+        # self.i = (self.i + 1) % (10 * (len(self.idleAnimate) - 1))
 
         self.rect = self.rect.move(self.velocity)
         self.healthBar.changeCurrLevel(self.health)
