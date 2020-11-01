@@ -128,7 +128,7 @@ class player(combatEntity):
     def __init__(self, *groups, ssmanager, platform, time):
         super().__init__(*groups, ssmanager=ssmanager, platform=platform, time=time)
         self.keyBindings = [pygame.K_a, pygame.K_d, pygame.K_b, pygame.K_q, pygame.K_e, pygame.K_w, pygame.K_s,
-                            pygame.K_SPACE, pygame.K_r, pygame.K_f, pygame.K_t, pygame.K_z]
+                            pygame.K_SPACE, pygame.K_r, pygame.K_f, pygame.K_t, pygame.K_z, 0, pygame.K_c]
         '''
         keybinding help: 
         [0] : Walk-Left
@@ -143,6 +143,7 @@ class player(combatEntity):
         [10]: magic push
         [11]: auto-aim-shoot
         ~[12]: toggle auto aim
+        [13]: toggle selected enemy
         '''
         playerConfig = currentConfigurations.playerConfig('player.pkl')
         self.data = playerConfig.read()
@@ -162,6 +163,7 @@ class player(combatEntity):
 
     def update(self):
         self.rect = self.rect.move(self.velocity)
+        # print(self.tangible, self.velocity[0])
         # remove this later
         self.health = 100
         for i in self.group[0]:
@@ -240,6 +242,10 @@ class player(combatEntity):
                 self.magicBar.decrease(20)
             if self.keys[self.keyBindings[8]] and self.bulletCount == 0:
                 self.bulletCount = self.data.gunSlots
+            if self.keys[self.keyBindings[3]]:
+                self.meleeAttack(False)
+            if self.keys[self.keyBindings[4]]:
+                self.meleeAttack(True)
             if self.lock[0] and self.keys[self.keyBindings[11]] and self.bulletCount > 0:
                 # TODO: DO changes here
                 projectiles.bullets(self.group[1], creator=self,
@@ -248,7 +254,7 @@ class player(combatEntity):
                                         30.0)))
                 self.bulletCount -= 1
             '''temp code'''
-            if event.key == pygame.K_c:
+            if event.key == self.keys[self.keyBindings[13]]:
                 self.lockedEnemy = (self.lockedEnemy + 1) % len(self.enemy)
                 print(self.lockedEnemy)
             '''temp code'''
@@ -268,14 +274,14 @@ class player(combatEntity):
     def meleeAttack(self, aType: bool):
         # aType true means heavy attack false means light attack
         for i in self.enemy:
-            if self.facing and 0 < i.rect.x - self.rect.x < 100:
+            if self.facing and 0 < i.rect.x - self.rect.x < 100 and abs(self.rect.y - i.rect.y) < 200:
                 if aType:
                     i.damage(int(30 * self.data.damageMultiplier))
                     print('[player]: heavy')
                 else:
                     i.damage(int(10 * self.data.damageMultiplier))
                     print('[player]: light')
-            elif not self.facing and 0 > i.rect.x - self.rect.x > -100:
+            elif not self.facing and 0 > i.rect.x - self.rect.x > -100 and abs(self.rect.y - i.rect.y) < 200:
                 if aType:
                     i.damage(int(30 * self.data.damageMultiplier))
                     print('[player]: heavy')
@@ -313,7 +319,12 @@ class player(combatEntity):
 class EnemyAI(combatEntity):
     def __init__(self, *groups, ssmanager, platform, time):
         super().__init__(*groups, ssmanager=ssmanager, platform=platform, time=time)
-        self.image = pygame.transform.scale(pygame.image.load('assets/enemy.png'), self.rect.size)
+        # self.image = pygame.transform.scale(pygame.image.load('assets/enemy.png'), self.rect.size)
+        self.idleAnimate = ssmanager.getOther('assets/Enemy-Dark_Wraith/idle.png', (0, 0, 0), (500, 100), 5, (200, 200),
+                                              True)
+        # somewhat working animation
+        self.image = self.idleAnimate[0]
+        self.i = 0
         self.rect.x = 500
         self.walking = False
         self.invisibleRect = pygame.rect.Rect(self.rect.x - 50, self.rect.y, 225, self.rect.height)
@@ -330,6 +341,9 @@ class EnemyAI(combatEntity):
                 break
 
     def update(self, *args, ):
+        self.image = pygame.transform.flip(self.idleAnimate[self.i // 10], not self.facing, False)
+        self.i = (self.i + 1) % (10 * (len(self.idleAnimate) - 1))
+
         self.rect = self.rect.move(self.velocity)
         self.healthBar.changeCurrLevel(self.health)
         self.stunRect.changeCurrLevel(self.stunBar.currentLevel())
