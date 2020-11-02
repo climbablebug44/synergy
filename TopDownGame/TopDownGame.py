@@ -1,5 +1,3 @@
-#       THIS FILE IS INCOMPLETE , UPLOADED JUST TO TEST 
-
 import pygame, tkinter as tk
 from pygame.locals import *
 from tkinter import filedialog
