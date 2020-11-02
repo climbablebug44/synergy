@@ -2,7 +2,8 @@ import math
 
 import pygame
 import random
-from CombatSystem import projectiles, collectibles, gameConstants as gc, screenElements, currentConfigurations
+from CombatSystem import projectiles, collectibles, screenElements, currentConfigurations
+from common import gameConstants as gc
 
 
 class deltaTime:
@@ -159,6 +160,7 @@ class player(combatEntity):
         self.lock = [self.data.autoAim, self.lockedEnemy]
 
     def update(self):
+        print(self.lockedEnemy)
         self.rect = self.rect.move(self.velocity)
         self.health = 100
         for i in self.group[0]:
@@ -228,11 +230,11 @@ class player(combatEntity):
                 projectiles.forceField(self.group[1], creator=self, direction=self.facing)
                 projectiles.forceField(self.group[1], creator=self, direction=not self.facing)
                 self.magicBar.decrease(20)
-            if self.keys[self.keyBindings[8]] and self.bulletCount == 0:
+            if event.key == self.keyBindings[8] and self.bulletCount == 0:
                 self.bulletCount = self.data.gunSlots
-            if self.keys[self.keyBindings[3]]:
+            if event.key == self.keyBindings[3]:
                 self.meleeAttack(False)
-            if self.keys[self.keyBindings[4]]:
+            if event.key == self.keyBindings[4]:
                 self.meleeAttack(True)
             if self.lock[0] and self.keys[self.keyBindings[11]] and self.bulletCount > 0:
                 # TODO: DO changes here
@@ -242,7 +244,7 @@ class player(combatEntity):
                                         30.0)))
                 self.bulletCount -= 1
             '''temp code'''
-            if event.key == self.keys[self.keyBindings[13]]:
+            if event.key == self.keyBindings[13]:
                 self.lockedEnemy = (self.lockedEnemy + 1) % len(self.enemy)
                 print(self.lockedEnemy)
             '''temp code'''
@@ -442,12 +444,12 @@ class EnemyAI(combatEntity):
         else:
             self.tangible = True
 
-    def distanceFromPlayer(self, Outformat=''):
+    def distanceFromPlayer(self, outFormat=''):
         x_ = self.player.rect.x - self.rect.x
         y_ = self.player.rect.y - self.rect.y
-        if Outformat == 'x':
+        if outFormat == 'x':
             return x_
-        elif Outformat == 'y':
+        elif outFormat == 'y':
             return y_
         else:
             return x_, y_

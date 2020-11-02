@@ -1,13 +1,12 @@
-import pygame
 from Screens.menu import *
-
+import common.gameConstants as gc
 
 class Game:
     def __init__(self, screen):
         pygame.init()
         self.running, self.playing = True, False
         self.UP_KEY, self.DOWN_KEY, self.START_KEY, self.BACK_KEY = False, False, False, False
-        self.DISPLAY_W, self.DISPLAY_H = 800, 600
+        self.DISPLAY_W, self.DISPLAY_H = gc.screenSize
         self.display = screen
         self.window = pygame.display.set_mode((self.DISPLAY_W, self.DISPLAY_H))
         self.font_name = 'freesansbold.ttf'

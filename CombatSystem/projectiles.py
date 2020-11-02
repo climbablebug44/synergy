@@ -1,6 +1,6 @@
 import pygame
 from CombatSystem import playerEntity
-from CombatSystem import gameConstants as gc
+from common import gameConstants as gc
 
 
 class projectiles(pygame.sprite.Sprite):
