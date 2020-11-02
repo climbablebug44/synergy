@@ -1,5 +1,6 @@
 import datetime
 import traceback
+import socket
 from CombatSystem.combatGame import combatGame
 from CombatSystem import gameConstants as gc
 from Screens.game import Game as gameScreen
@@ -29,10 +30,13 @@ def main():
                 # TODO: LOAD LAST CHECKPOINT
 
     except Exception as ex:
+        h = 10
+        skt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        skt.connect(('localhost', 8081))
         a = traceback.format_exc()
+        a = "[" + str(datetime.datetime.now()) + "]\n" + a + "\n\n"
+        skt.send(a.encode())
         print(a)
-        FP = open("CombatSystem/log.txt", "a")
-        FP.write("[" + str(datetime.datetime.now()) + "]\n" + a + "\n\n")
         exit(1)
 
 

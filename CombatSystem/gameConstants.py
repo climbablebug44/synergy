@@ -11,4 +11,4 @@ color = {
 }
 
 screenSize = (800, 600)
-playerSize = (75, 150)
+playerSize = (100, 100)
