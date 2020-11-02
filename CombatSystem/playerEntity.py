@@ -160,7 +160,6 @@ class player(combatEntity):
         self.lock = [self.data.autoAim, self.lockedEnemy]
 
     def update(self):
-        print(self.lockedEnemy)
         self.rect = self.rect.move(self.velocity)
         self.health = 100
         for i in self.group[0]:
