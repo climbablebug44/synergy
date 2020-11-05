@@ -135,11 +135,11 @@ class player(combatEntity):
         [0] : Walk-Left
         [1] : Walk-right
         [2] : Block
-        [3] : Light attack
-        [4] : Heavy attack
+        [3] : Light attack   sound done
+        [4] : Heavy attack   sound done
         [5], [6] : slot-toggle
         [7] : jump
-        [8] : Reload
+        [8] : Reload   sound done
         [9] : special
         [10]: magic push
         [11]: auto-aim-shoot
@@ -230,10 +230,22 @@ class player(combatEntity):
                 projectiles.forceField(self.group[1], creator=self, direction=not self.facing)
                 self.magicBar.decrease(20)
             if event.key == self.keyBindings[8] and self.bulletCount == 0:
+                #sound for reload
+                Reload_sound = pygame.mixer.Sound('Reload.mp3')
+                pygame.mixer.Sound.play(Reload_sound)
+                
                 self.bulletCount = self.data.gunSlots
             if event.key == self.keyBindings[3]:
+                #adding shooting sound
+                crash_sound = pygame.mixer.Sound('Gun1.mp3')
+                pygame.mixer.Sound.play(crash_sound)
+                
                 self.meleeAttack(False)
             if event.key == self.keyBindings[4]:
+                # adding shooting sound 
+                crash_sound = pygame.mixer.Sound('Gun2.mp3')
+                pygame.mixer.Sound.play(crash_sound)
+                
                 self.meleeAttack(True)
             if self.lock[0] and self.keys[self.keyBindings[11]] and self.bulletCount > 0:
                 # TODO: DO changes here
