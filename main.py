@@ -17,6 +17,7 @@ def main():
         updateAvailable = skt.recv(1024)
         skt.send('True'.encode())
         updateAvailable = updateAvailable.decode('ascii')
+        print(updateAvailable)
         if updateAvailable == "True":
             filename = skt.recv(1024)
             skt.send('True'.encode())

@@ -6,6 +6,7 @@ sock.bind(('localhost', 8081))
 sock.listen(20)
 
 update_file = ['file1.py']
+updateAvailable = 'False'
 
 while True:
     try:
@@ -16,12 +17,17 @@ while True:
                 f.write(data)
         elif data == 'UPDATE':
             print('update')
-            conn.send('True'.encode())
-            for i in update_file:
+            conn.send(updateAvailable.encode())
+            # TODO: SENDING UPDATE FILES
+            '''for i in update_file:
                 conn.send(i.encode())
                 x = conn.recv(1024).decode('ascii')
                 with open(i, 'rb') as file:
-                    conn.send(file.read())
+                    conn.send(file.read())'''
 
+    except KeyboardInterrupt:
+        sock.close()
+        break
     except Exception as e:
         print(e)
+        break
