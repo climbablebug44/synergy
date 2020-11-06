@@ -1,56 +1,49 @@
 import pygame
+import common.gameConstants as gc
+
+
+class levelBar(pygame.sprite.Sprite):
+    def __init__(self, *groups, size, position, maxlevel, entity):
+        super().__init__(*groups)
+        if size[0] < 3 or size[1] < 3:
+            raise Exception('Invalid Size')
+        self.image = pygame.Surface(size)
+        self.rect = self.image.get_rect()
+        if position != ():
+            self.rect.x, self.rect.y = position
+        self.size = size
+        self.entity = entity
+        self.maxlevel = maxlevel
+        self.updatepos = (position == ())
+
+    def update(self):
+        self.image.fill(gc.color['BLACK'])
+        if self.updatepos:
+            self.rect.x, self.rect.y = self.entity.rect.x, self.entity.rect.y
+
+
+class healthBar(levelBar):
+    def __init__(self, *groups, size, position, entity, colors, maxL):
+        super().__init__(*groups, position=position, size=size, maxlevel=maxL, entity=entity)
+        self.colors = colors
+
+    def update(self):
+        super(healthBar, self).update()
+        level = (self.entity.health / self.maxlevel) * (self.size[0] - 2)
+        pygame.draw.rect(self.image, (self.colors[0] if self.entity.health > 20 else self.colors[1]),
+                         pygame.Rect(1, 1, level, self.size[0]))
 
 
 # TODO: THIS PART IS BROKEN
 
-class levelBar(pygame.sprite.Sprite):
-    def __init__(self, *groups, MaxLevel, entity, pos, size=(710, 20), colorScheme):
-        super().__init__(*groups)
-        self.maxLevel = MaxLevel
-        self.currLevel = MaxLevel
-        self.image = pygame.Surface(size).convert()
-        self.image.fill((0, 0, 0))
-        self.colorScheme = colorScheme
-        pygame.draw.rect(self.image, self.colorScheme[1], pygame.rect.Rect(5, 5, self.maxLevel, 10))
-        self.rect = self.image.get_rect()
-        self.rect.x, self.rect.y = pos[0], pos[1]  # 40
-        self.entity = entity
 
-    def changeCurrLevel(self, x):
-        self.currLevel = x
-
-    def update(self):
-        currLevel = self.currLevel
-        currLevel = int(700 * (currLevel / self.maxLevel))
-        if currLevel > self.maxLevel // 5:
-            color = self.colorScheme[1]
-        else:
-            color = self.colorScheme[0]
-        self.image.fill((0, 0, 0))
-        pygame.draw.rect(self.image, color, pygame.rect.Rect(5, 5, currLevel, 10))
+class stunBar(levelBar):
+    def __init__(self, *groups, size, position, maxlevel, entity):
+        super().__init__(*groups, size=size, position=position, maxlevel=maxlevel, entity=entity)
+        pass
 
 
 class currentSlot(pygame.sprite.Sprite):
     def __init__(self, *groups):
         super().__init__(*groups)
         pass
-
-
-# TODO: Remove code
-
-'''
-if __name__ == '__main__':
-    pygame.init()
-    c = pygame.time.Clock()
-    screen = pygame.display.set_mode((800, 600))
-    group = pygame.sprite.Group()
-    while True:
-        for e in pygame.event.get():
-            if e.type == pygame.KEYDOWN and e.key == pygame.K_q or e.type == pygame.QUIT:
-                exit(0)
-        screen.fill((255, 255, 255))
-        # blitEntity = healthBar(group)
-        group.draw(screen)
-        pygame.display.flip()
-        c.tick(60)
-'''

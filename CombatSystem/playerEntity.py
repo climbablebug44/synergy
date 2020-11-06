@@ -158,10 +158,15 @@ class player(combatEntity):
         self.dashing = False
         self.lockedEnemy = 0
         self.lock = [self.data.autoAim, self.lockedEnemy]
+        self.healthBar = screenElements.healthBar(self.group, entity=self,
+                                                  position=(gc.screenSize[0] // 10, 10),
+                                                  colors=(gc.color['GREEN'], gc.color["RED"]),
+                                                  size=(gc.screenSize[0] // 2, 10), maxL=self.health)
 
     def update(self):
         self.rect = self.rect.move(self.velocity)
-        self.health = 100
+        if pygame.key.get_pressed()[pygame.K_F1]:
+            self.health = 375
         for i in self.group[0]:
             if i != self and isinstance(i, EnemyAI):
                 if i not in self.enemy:
@@ -230,23 +235,23 @@ class player(combatEntity):
                 projectiles.forceField(self.group[1], creator=self, direction=not self.facing)
                 self.magicBar.decrease(20)
             if event.key == self.keyBindings[8] and self.bulletCount == 0:
-                #sound for reload
-                Reload_sound = pygame.mixer.Sound('Reload.mp3')
-                pygame.mixer.Sound.play(Reload_sound)
-                
+                # sound for reload
+                # Reload_sound = pygame.mixer.Sound('Reload.mp3')
+                # pygame.mixer.Sound.play(Reload_sound)
                 self.bulletCount = self.data.gunSlots
+
             if event.key == self.keyBindings[3]:
-                #adding shooting sound
-                crash_sound = pygame.mixer.Sound('Gun1.mp3')
-                pygame.mixer.Sound.play(crash_sound)
-                
+                # adding shooting sound
+                # crash_sound = pygame.mixer.Sound('Gun1.mp3')
+                # pygame.mixer.Sound.play(crash_sound)
                 self.meleeAttack(False)
+
             if event.key == self.keyBindings[4]:
                 # adding shooting sound 
-                crash_sound = pygame.mixer.Sound('Gun2.mp3')
-                pygame.mixer.Sound.play(crash_sound)
-                
+                # crash_sound = pygame.mixer.Sound('Gun2.mp3')
+                # pygame.mixer.Sound.play(crash_sound)
                 self.meleeAttack(True)
+
             if self.lock[0] and self.keys[self.keyBindings[11]] and self.bulletCount > 0:
                 # TODO: DO changes here
                 projectiles.bullets(self.group[1], creator=self,
@@ -331,11 +336,12 @@ class EnemyAI(combatEntity):
         self.walking = False
         self.invisibleRect = pygame.rect.Rect(self.rect.x - 50, self.rect.y, 225, self.rect.height)
         self.player = None
-        self.stunRect = screenElements.levelBar(self.group[1], MaxLevel=100, entity=self, pos=(80, 30),
-                                                colorScheme=(gc.color['RED'], gc.color['RED']), size=(60, 10))
-        self.healthBar = screenElements.levelBar(groups[1], MaxLevel=375, entity=self, pos=(40, 10), size=(710, 20),
-                                                 colorScheme=(gc.color['RED'], gc.color['GREEN']))
-        # self.stunRect = pygame.rect.Rect(20, 50, (self.health / 100) * 600, 10)
+
+        self.healthBar = screenElements.healthBar(self.group, entity=self,
+                                                  position=(),
+                                                  colors=(gc.color['GREEN'], gc.color["RED"]),
+                                                  size=(gc.playerSize[0], 5), maxL=self.health)
+
         '''Get player'''
         for i in self.group[0]:
             if i != self:
@@ -347,8 +353,8 @@ class EnemyAI(combatEntity):
         self.i = (self.i + 1) % (10 * (len(self.idleAnimate) - 1))
 
         self.rect = self.rect.move(self.velocity)
-        self.healthBar.changeCurrLevel(self.health)
-        self.stunRect.changeCurrLevel(self.stunBar.currentLevel())
+        # self.healthBar.changeCurrLevel(self.health)
+        # self.stunRect.changeCurrLevel(self.stunBar.currentLevel())
         '''Randomly Shoot towards player'''
         if not self.stunBar.currentLevel(0):
             if random.randint(0, 5000) < 3:
@@ -471,6 +477,10 @@ class EnemyAI(combatEntity):
             collectibles.healthBoost(self.group, floor=self.platform, pos=(self.rect.x, self.rect.y),
                                      dire=not self.facing,
                                      player=self.player)
+
+    def kill(self):
+        self.healthBar.kill()
+        super(EnemyAI, self).kill()
 
 
 class smallEnemy(EnemyAI):

@@ -73,17 +73,15 @@ class combatGame(object):
         self.screen.blit(text_surface, text_rect)
 
     def mainLoop(self):
-
+        pygame.mixer.music.load('assets/sounds/Deal.mp3')
+        pygame.mixer.music.play(-1)
         while self.running:
-            pygame.mixer.music.load('Deal.mp3')
-            pygame.mixer.music.play(-1)
             for event in pygame.event.get():
-                # print(type(event))
                 if event.type == pygame.QUIT:
                     exit()
                 if event.type == pygame.KEYDOWN or event.type == pygame.KEYUP or event.type == pygame.MOUSEBUTTONDOWN:
                     self.player.eventHandle(event)
-                if (event.type == pygame.KEYDOWN or event.type == pygame.KEYUP) and event.key == pygame.K_ESCAPE:
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     self.pause()
                     # TODO: pause
              
@@ -105,6 +103,7 @@ class combatGame(object):
             x = self.checkResult()
             if x is not None:
                 self.sSManager = None
+                pygame.mixer.music.stop()
                 return x
 
     def checkResult(self):

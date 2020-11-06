@@ -9,6 +9,27 @@ from TopDownGame.TopDownGame import TopDownGame
 
 
 def main():
+    # TODO: CHECK UPDATE FILES
+    skt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        skt.connect(('localhost', 8081))
+        skt.send('UPDATE'.encode())
+        updateAvailable = skt.recv(1024)
+        skt.send('True'.encode())
+        updateAvailable = updateAvailable.decode('ascii')
+        if updateAvailable == "True":
+            filename = skt.recv(1024)
+            skt.send('True'.encode())
+            with open(filename, 'wb') as fileRepl:
+                x = skt.recv(1024)
+                fileRepl.write(x)
+        elif updateAvailable == 'False':
+            print('no update available')
+        else:
+            print('Garbage recieved')
+    except ConnectionRefusedError:
+        print('Server not found')
+
     try:
         pygame.init()
         screen = pygame.display.set_mode(gc.screenSize)
@@ -31,18 +52,18 @@ def main():
                 # TODO: LOAD LAST CHECKPOINT, LOST FROM ENEMY
 
     except Exception as ex:
-        h = 10
+        a = traceback.format_exc()
+        a = "[" + str(datetime.datetime.now()) + "]\n" + a + "\n\n"
         skt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             skt.connect(('localhost', 8081))
-            a = traceback.format_exc()
-            a = "[" + str(datetime.datetime.now()) + "]\n" + a + "\n\n"
-            print(a)
             skt.send(a.encode())
             print(a)
         except ConnectionRefusedError:
             pass
-        exit(1)
+        finally:
+            print(a)
+            exit(1)
 
 
 if __name__ == '__main__':

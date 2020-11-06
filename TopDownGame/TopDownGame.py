@@ -103,51 +103,38 @@ class Player:
 class TopDownGame:
     def __init__(self, screen):
         global font
-        # pygame.init()
         pygame.display.set_caption("TopDonwGame")
-        # self.screen = pygame.display.set_mode((screen_w, screen_h))
         self.screen = screen
-
         self.background_color = WHITE
-
         self.sprite_list = []
         self.static_list = []
         self.start_label_sprite = None
-
         self.font = pygame.font.SysFont(None, 24)
         font = self.font
-
-        try:
-            f = open(MAPNAME, 'r')
-            print("Map in " + MAPNAME + " opened successfully")
-            l = f.read()
-            l = l.split('\n')
-
-            for pos, j in enumerate(l[:-1]):
-                i = j.split(",", 6)
-                fn = i[0]
-                if fn[0] == "I":
-                    surf = pygame.image.load('TopDownGame/'+fn[2:])
-                    surf = surf.convert_alpha()
-                    ts = sprite(surf, [0, 0], fn[2:])
-                    ts.rotate(float(i[3]))
-                    ts.changeSize(float(i[4]))
-                    ts.rect.topleft = [int(i[1]), int(i[2])]
-                    if str(i[5][2:]) == "True":
-                        ts.collide = True
-                    ts.oncollide = i[6]
-                    self.sprite_list.append(ts)
-                    if pos == 0:
-                        self.start_label_sprite = ts
-                elif fn[0] == "T":
-                    print("appending static")
-                    self.static_list.append(Static(fn[2:], (int(i[1]), int(i[2]))))
-
-            f.close()
-
-        except Exception as e:
-            print(traceback.format_exc())
-            print("No Existing map found , loading the default one")
+        f = open(MAPNAME, 'r')
+        print("Map in " + MAPNAME + " opened successfully")
+        l = f.read()
+        l = l.split('\n')
+        for pos, j in enumerate(l[:-1]):
+            i = j.split(",", 6)
+            fn = i[0]
+            if fn[0] == "I":
+                surf = pygame.image.load('TopDownGame/' + fn[2:])
+                surf = surf.convert_alpha()
+                ts = sprite(surf, [0, 0], fn[2:])
+                ts.rotate(float(i[3]))
+                ts.changeSize(float(i[4]))
+                ts.rect.topleft = [int(i[1]), int(i[2])]
+                if str(i[5][2:]) == "True":
+                    ts.collide = True
+                ts.oncollide = i[6]
+                self.sprite_list.append(ts)
+                if pos == 0:
+                    self.start_label_sprite = ts
+            elif fn[0] == "T":
+                print("appending static")
+                self.static_list.append(Static(fn[2:], (int(i[1]), int(i[2]))))
+        f.close()
 
         # setting the player
         self.player = Player(screen_w, screen_h)
@@ -178,7 +165,7 @@ class TopDownGame:
 
             should_move = True
             for i in self.sprite_list:
-                if (i.collide):
+                if i.collide:
                     if (
                             i.rect.move(moved).colliderect(
                                 self.player.rect_list[0])):  # technically the 0 should be player.num
@@ -196,6 +183,8 @@ class TopDownGame:
                 self.screen.blit(i.surf, i.rect)
 
             for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    exit()
                 if event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
                         playing = False
@@ -258,8 +247,6 @@ class TopDownGame:
             if frame_num == 61:
                 frame_num = 1
             clock.tick(60)
-
-        # pygame.quit()
 
 
 if __name__ == "__main__":
