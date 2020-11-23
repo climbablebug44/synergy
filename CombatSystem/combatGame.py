@@ -75,6 +75,7 @@ class combatGame(object):
     def mainLoop(self):
         pygame.mixer.music.load('assets/sounds/Deal.mp3')
         pygame.mixer.music.play(-1)
+        x=0.7
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -84,7 +85,17 @@ class combatGame(object):
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     self.pause()
                     # TODO: pause
-             
+                 #setting for inc/dec volume
+                
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_V:
+                    if(x>0&&x<=1):
+                        x=x+0.1
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_B:
+                    if(x>0):
+                        x=x-0.1
+            pygame.mixer.music.set_volume(x)            
+                   
+                    
             self.screen.fill(c.color['BLACK'])
             self.constructBackground()  # Draws background
             self.allSprites.update()
