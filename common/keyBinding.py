@@ -1,7 +1,7 @@
 import pygame
 
 
-class keybinding:
+class keyBinding:
   def __init__(self):
     self.bindings = [pygame.K_a, pygame.K_d, pygame.K_b, pygame.K_q, pygame.K_e, pygame.K_w, pygame.K_s, pygame.K_SPACE, pygame.K_r, pygame.K_f, pygame.K_t, pygame.K_z, 0, pygame.K_c]
     
