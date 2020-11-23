@@ -302,6 +302,78 @@ class OptionsMenu(Menu):
                 return 'L-Ctrl'
             elif key == pygame.K_RCTRL:
                 return 'R-Ctrl'
+    # For  accesing volumw controls
+    def Volume_control(self):
+        self.run_display = True
+        while self.run_display:
+            self.game.check_events()
+            self.game.display.fill((0, 0, 0))
+            image1 = pygame.image.load(r'Screens/Volume.png')
+            image1 = pygame.transform.scale(image1, (420, 120))
+            self.game.window.blit(image1, (200, 0))
+            pygame.display.update()
+            self.game.draw_text('Music',28,300,200)
+            self.game.draw_text('Bullets',28,295,270)
+            self.game.window.blit(self.game.display, (0, 0))
+            mouse = pygame.mouse.get_pos()
+            smallfont = pygame.font.SysFont('Corbel', 18)
+            text = smallfont.render('0', True, [255, 255, 255])
+            pygame.draw.rect(self.game.window, [48, 48, 48], [380, 195, 65, 15])
+            self.game.window.blit(text, (410, 194))
+            
+            smallfont = pygame.font.SysFont('Corbel', 18)
+            text = smallfont.render("-", True, [255, 255, 255])
+            if 350<=mouse[0]<=370 and 195<=mouse[1]<=210:
+                pygame.draw.rect(self.game.window,[66, 168, 147],[350,195,20,15])
+                '''if(self.x[0]>0):
+                    self.x[0]=self.x[0]-1'''
+            else:
+                 pygame.draw.rect(self.game.window,[48,48,48],[350,195,20,15])
+            self.game.window.blit(text,(357,194))
+            
+            smallfont = pygame.font.SysFont('Corbel', 18)
+            text = smallfont.render("+", True, [255, 255, 255])
+            if 455<=mouse[0]<=475 and 195<=mouse[1]<=210:
+                pygame.draw.rect(self.game.window,[66, 168, 147],[455,195,20,15])
+                #self.x=self.x+1
+            else:
+                pygame.draw.rect(self.game.window,[48,48,48],[455,195,20,15])
+            self.game.window.blit(text,(460,194))
+            
+            smallfont = pygame.font.SysFont('Corbel', 18)
+            text = smallfont.render('0', True, [255, 255, 255])
+            pygame.draw.rect(self.game.window, [48, 48, 48], [380, 265, 65, 15])
+            self.game.window.blit(text, (410, 264))
+            
+            smallfont = pygame.font.SysFont('Corbel', 18)
+            text = smallfont.render("-", True, [255, 255, 255])
+            if 350<=mouse[0]<=370 and 265<=mouse[1]<=280:
+                pygame.draw.rect(self.game.window,[66, 168, 147],[350,265,20,15])
+                '''if(self.x[1]>0):
+                    self.x[1]=self.x[1]-1'''
+            else:
+                pygame.draw.rect(self.game.window,[48,48,48],[350,265,20,15])
+            self.game.window.blit(text,(357,264))
+            
+            smallfont = pygame.font.SysFont('Corbel', 18)
+            text = smallfont.render("+", True, [255, 255, 255])
+            if 455<=mouse[0]<=475 and 265<=mouse[1]<=280:
+                pygame.draw.rect(self.game.window,[66, 168, 147],[455,265,20,15])
+                #self.x[1]=self.x[1]+1
+            else:
+                pygame.draw.rect(self.game.window,[48,48,48],[455,265,20,15])
+            
+            self.game.window.blit(text,(460,264))
+            
+            for ev in pygame.event.get():
+                if ev.type == pygame.QUIT:
+                    pygame.quit()
+                    quit()
+                if ev.type == pygame.KEYDOWN:
+                    if ev.key == pygame.K_BACKSPACE:
+                        self.game.BACK_KEY = True
+                        self.run_display = False
+                        self.game.display.fill(self.game.BLACK)
 
 
 class CreditsMenu(Menu):
