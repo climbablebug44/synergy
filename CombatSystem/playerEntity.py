@@ -3,7 +3,7 @@ import math
 import pygame
 import random
 from CombatSystem import projectiles, collectibles, screenElements, currentConfigurations
-from common import gameConstants as gc
+from common import gameConstants as gc, keyBinding
 
 
 class deltaTime:
@@ -128,8 +128,7 @@ class combatEntity(pygame.sprite.Sprite):
 class player(combatEntity):
     def __init__(self, *groups, ssmanager, platform, time):
         super().__init__(*groups, ssmanager=ssmanager, platform=platform, time=time)
-        self.keyBindings = [pygame.K_a, pygame.K_d, pygame.K_b, pygame.K_q, pygame.K_e, pygame.K_w, pygame.K_s,
-                            pygame.K_SPACE, pygame.K_r, pygame.K_f, pygame.K_t, pygame.K_z, 0, pygame.K_c]
+        self.keyBindings = keyBinding.keyBinding().get()
         '''
         keybinding help: 
         [0] : Walk-Left
@@ -505,6 +504,7 @@ class smallFlyingEnemySpawner(EnemyAI):
                 break
         self.replicate = deltaTime()
         self.health = 150
+        self.healthBar.maxlevel = self.health
         self.flip = False
 
     def update(self, *args):
@@ -548,6 +548,7 @@ class smallFlyingEnemySpawned(EnemyAI):
                 self.player = i
                 break
         self.health = 40
+        self.healthBar.maxlevel = self.health
         self.flip = False
 
     def update(self, *args):
