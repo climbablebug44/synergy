@@ -32,7 +32,8 @@ class bullets(projectiles):
                 if (isinstance(i, playerEntity.EnemyAI) and isinstance(self.creator, playerEntity.player)) or (
                         isinstance(i, playerEntity.player) and isinstance(self.creator, playerEntity.EnemyAI)):
                     '''Reducing health'''
-                    i.damage(10, 5)
+                    if not i.blocking or i.stunBar.currLevel() <= 0:
+                        i.damage(10, 5)
                     self.kill()
         super(bullets, self).update()
 
