@@ -28,11 +28,12 @@ class bullets(projectiles):
     def update(self, *args):
         self.rect = self.rect.move(self.velocity)
         for i in self.group:
-            if (isinstance(i, playerEntity.EnemyAI) and isinstance(self.creator, playerEntity.player)) or (
-                    isinstance(i, playerEntity.player) and isinstance(i, playerEntity.EnemyAI)):
-                '''Reducing health'''
-                i.damage(10, 5)
-                self.kill()
+            if self.rect.colliderect(i):
+                if (isinstance(i, playerEntity.EnemyAI) and isinstance(self.creator, playerEntity.player)) or (
+                        isinstance(i, playerEntity.player) and isinstance(self.creator, playerEntity.EnemyAI)):
+                    '''Reducing health'''
+                    i.damage(10, 5)
+                    self.kill()
         super(bullets, self).update()
 
 

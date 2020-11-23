@@ -45,9 +45,7 @@ class combatGame(object):
         self.screen.blit(self.bg[0], (0, 0))
 
     def pause(self):
-        print('In pause')
         paused = True
-        
         while paused:
             pygame.mixer.music.pause()
             for event in pygame.event.get():
@@ -75,7 +73,7 @@ class combatGame(object):
     def mainLoop(self):
         pygame.mixer.music.load('assets/sounds/Deal.mp3')
         pygame.mixer.music.play(-1)
-        x=0.7
+        volume = 0.7
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -85,17 +83,15 @@ class combatGame(object):
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     self.pause()
                     # TODO: pause
-                 #setting for inc/dec volume
-                
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_V:
-                    if(x>0&&x<=1):
-                        x=x+0.1
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_B:
-                    if(x>0):
-                        x=x-0.1
-            pygame.mixer.music.set_volume(x)            
-                   
-                    
+                # setting for inc/dec volume
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_v:
+                    if 0 < volume <= 1:
+                        volume = volume + 0.1
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_b:
+                    if volume > 0:
+                        volume = volume - 0.1
+            pygame.mixer.music.set_volume(volume)
+
             self.screen.fill(c.color['BLACK'])
             self.constructBackground()  # Draws background
             self.allSprites.update()
@@ -111,11 +107,11 @@ class combatGame(object):
             pygame.display.flip()
             self.clock.tick(60)
 
-            x = self.checkResult()
-            if x is not None:
+            result = self.checkResult()
+            if result is not None:
                 self.sSManager = None
                 pygame.mixer.music.stop()
-                return x
+                return result
 
     def checkResult(self):
         if len(self.player.enemy) == 0:
