@@ -128,7 +128,9 @@ class combatEntity(pygame.sprite.Sprite):
 class player(combatEntity):
     def __init__(self, *groups, ssmanager, platform, time):
         super().__init__(*groups, ssmanager=ssmanager, platform=platform, time=time)
-        self.keyBindings = keyBinding.keyBinding().get()
+        # self.keyBindings = keyBinding.keyBinding().get()
+        self.keyBindings = [pygame.K_a, pygame.K_d, pygame.K_b, pygame.K_q, pygame.K_e, pygame.K_w, pygame.K_s,
+                            pygame.K_SPACE, pygame.K_r, pygame.K_f, pygame.K_t, pygame.K_z, 0, pygame.K_c]
         '''
         keybinding help: 
         [0] : Walk-Left
