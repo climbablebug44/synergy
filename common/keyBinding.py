@@ -1,17 +1,24 @@
-class temp:
-  
-  keys = ['W', 'S', 'A', 'D', 'P', 'C', 'U', 'I', 'Space', 'E', 'B', 'Q', 'Done']
-  
+import pygame
+
+
+class keybinding:
   def __init__(self):
-    self.arr = temp.keys
-  
-  def funct1(self):
-    file1 = open("file.txt",w+")
-    file1.write(self.arr)
-    file1.close() 
-  
-  def funct2(self, repl):
-    self.arr = repl
-    file1 = open("file.txt",w+")
-    file1.write(self.arr)
-    file1.close() 
+    self.bindings = [pygame.K_a, pygame.K_d, pygame.K_b, pygame.K_q, pygame.K_e, pygame.K_w, pygame.K_s, pygame.K_SPACE, pygame.K_r, pygame.K_f, pygame.K_t, pygame.K_z, 0, pygame.K_c]
+    
+    
+  def get(self):
+    try:
+      with open('assets/keys.bin','r') as fp:
+        self.bindings = fp.read()
+      self.bindings = eval(self.bindings)
+      return self.bindings
+    except FileNotFoundError:
+      return self.bindings
+    
+  def change(self, newL):
+    self.bindings = newL
+    self.commit()
+    
+  def commit(self):
+    with open('assets/keys.bin','r') as fp:
+      fp.write(self.bindings.__str__())
