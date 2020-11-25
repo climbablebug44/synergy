@@ -248,6 +248,9 @@ class player(combatEntity):
                 mixer.init()
                 pygame.mixer.music.load('assets/sounds/Reload.mp3')
                 pygame.mixer.music.play(1)
+                #newly added
+                pygame.mixer.music.load('assets/sounds/Deal.mp3')
+                pygame.mixer.music.play(-1)
                 self.bulletCount = self.data.gunSlots
 
             if event.key == self.keyBindings[3]:
@@ -255,6 +258,9 @@ class player(combatEntity):
                 mixer.init()
                 pygame.mixer.music.load('assets/sounds/Gun1.mp3')
                 pygame.mixer.music.play(1)
+                #newly added
+                pygame.mixer.music.load('assets/sounds/Deal.mp3')
+                pygame.mixer.music.play(-1)
                 self.meleeAttack(False)
 
             if event.key == self.keyBindings[4]:
@@ -262,6 +268,9 @@ class player(combatEntity):
                 mixer.init()
                 pygame.mixer.music.load('assets/sounds/Gun2.mp3')
                 pygame.mixer.music.play(1)
+                #newly added
+                pygame.mixer.music.load('assets/sounds/Deal.mp3')
+                pygame.mixer.music.play(-1)
                 self.meleeAttack(True)
 
             if self.lock[0] and self.keys[self.keyBindings[11]] and self.bulletCount > 0:
