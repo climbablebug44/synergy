@@ -91,7 +91,6 @@ class combatGame(object):
                     if volume > 0:
                         volume = volume - 0.1
             pygame.mixer.music.set_volume(volume)
-
             self.screen.fill(c.color['BLACK'])
             self.constructBackground()  # Draws background
             self.allSprites.update()

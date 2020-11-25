@@ -40,7 +40,12 @@ class healthBar(levelBar):
 class stunBar(levelBar):
     def __init__(self, *groups, size, position, maxlevel, entity):
         super().__init__(*groups, size=size, position=position, maxlevel=maxlevel, entity=entity)
-        pass
+        self.colors = gc.color['RED']
+
+    def update(self):
+        super(stunBar, self).update()
+        level = (self.entity.stunBar.currentLevel() / self.maxlevel) * (self.size[0] - 2)
+        pygame.draw.rect(self.image, self.colors, pygame.Rect(1, 1, level, self.size[0]))
 
 
 class currentSlot(pygame.sprite.Sprite):

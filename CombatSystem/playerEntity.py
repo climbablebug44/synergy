@@ -1,5 +1,4 @@
 import math
-
 import pygame
 import random
 from CombatSystem import projectiles, collectibles, screenElements, currentConfigurations
@@ -152,7 +151,7 @@ class player(combatEntity):
         self.image = pygame.transform.scale(pygame.image.load('assets/player.png'), self.rect.size)
         self.magicBar = attackCooldown(self.data.maxCapacityMagicBar)  # Max Capacity
         self.enemy = []
-        self.attacks = [self.dashAttack, self.chargedAttack, self.whirlWindStrike, self.magicWeapon]
+        self.attacks = [self.dashAttack, self.chargedAttack, self.whirlWindStrike]
         self.slot = 0
         self.dashing = False
         self.lockedEnemy = 0
@@ -161,9 +160,13 @@ class player(combatEntity):
                                                   position=(gc.screenSize[0] // 10, 10),
                                                   colors=(gc.color['GREEN'], gc.color["RED"]),
                                                   size=(gc.screenSize[0] // 2, 10), maxL=self.health)
+        self.stunDisplay = screenElements.stunBar(self.group, entity=self, position=(gc.screenSize[0] // 10, 20),
+                                                  size=(gc.screenSize[0] // 2, 10),
+                                                  maxlevel=self.stunBar.currentLevel())
 
     def update(self):
         self.rect = self.rect.move(self.velocity)
+        # cheat code
         if pygame.key.get_pressed()[pygame.K_F1]:
             self.health = 375
         for i in self.group[0]:
@@ -195,6 +198,9 @@ class player(combatEntity):
         super(player, self).update()
 
     def movement(self):
+        if self.stunBar.currentLevel(0):
+            return
+        # player stunned
         moveFr, moveBa = True, True
         if self.tangible:
             for i in self.enemy:
@@ -225,6 +231,9 @@ class player(combatEntity):
             self.facing = False
 
     def eventHandle(self, event=None):
+        if self.stunBar.currentLevel(0):
+            return
+        # player stunned
         self.keys = pygame.key.get_pressed()
         self.mouse = pygame.mouse.get_pressed()
         if event.type == pygame.KEYDOWN:
@@ -267,10 +276,10 @@ class player(combatEntity):
                 self.attacks[self.slot]()
             '''Change - Slot'''
             if event.key == self.keyBindings[5]:
-                self.slot = (self.slot + 1) % 4
+                self.slot = (self.slot + 1) % len(self.attacks)
                 print(self.slot)
             elif event.key == self.keyBindings[6]:
-                self.slot = (self.slot - 1) % 4
+                self.slot = (self.slot - 1) % len(self.attacks)
                 print(self.slot)
         if event.type == pygame.MOUSEBUTTONDOWN:
             # Bullet
@@ -318,8 +327,9 @@ class player(combatEntity):
             print('[Player]: Whirl Wind Attack Success')
             self.magicBar.decrease(30)
 
-    def magicWeapon(self):
-        pass
+    def damage(self, hit, stun=0):
+        super(player, self).damage(hit=hit, stun=stun)
+        print(self.stunBar.currentLevel())
 
 
 class EnemyAI(combatEntity):
@@ -352,20 +362,12 @@ class EnemyAI(combatEntity):
         self.i = (self.i + 1) % (10 * (len(self.idleAnimate) - 1))
 
         self.rect = self.rect.move(self.velocity)
-        # self.healthBar.changeCurrLevel(self.health)
-        # self.stunRect.changeCurrLevel(self.stunBar.currentLevel())
         '''Randomly Shoot towards player'''
         if not self.stunBar.currentLevel(0):
             if random.randint(0, 5000) < 3:
                 self.shootPlayer()
-            # print(self.walking)
             if random.randint(0, 10) == 3:
                 self.walking = not self.walking
-
-            '''if self.rect.x < 100:
-                self.moveInDirection(False, 20)
-            if self.rect.x > 700:
-                self.moveInDirection(True, 20)'''
             if self.rect.x > gc.screenSize[0] - 100 or self.rect.x < 100:
                 if random.randint(0, 1):
                     self.walking = False
@@ -440,7 +442,7 @@ class EnemyAI(combatEntity):
         elif not self.player.blocking:  # TODO: Add player stun
             self.tangible = False
             self.moveInDirection(not self.facing, 30)
-            self.player.damage(30, 0)
+            self.player.damage(30, 10)
             print('[Enemy]: Heavy Attack')
 
     def attackPlayerLight(self):
@@ -449,7 +451,7 @@ class EnemyAI(combatEntity):
             return
         elif not self.player.blocking:
             self.moveInDirection(not self.facing)
-            self.player.damage(30, 0)
+            self.player.damage(30, 5)
             print('[Enemy]: Light Attack')
 
     def slowDown(self):
@@ -480,13 +482,6 @@ class EnemyAI(combatEntity):
     def kill(self):
         self.healthBar.kill()
         super(EnemyAI, self).kill()
-
-
-class smallEnemy(EnemyAI):
-    def __init__(self, *groups, ssmanager, platform, time):
-        super().__init__(*groups, ssmanager=ssmanager, platform=platform, time=time)
-        self.rect = pygame.rect.Rect(self.rect.x, self.rect.y, 50, 50)
-        self.image = pygame.transform.scale(self.image, (50, 50))
 
 
 class smallFlyingEnemySpawner(EnemyAI):
