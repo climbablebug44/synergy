@@ -5,6 +5,7 @@ from CombatSystem import projectiles, collectibles, screenElements, currentConfi
 from common import gameConstants as gc, keyBinding
 from pygame import mixer
 
+
 class deltaTime:
     def __init__(self):
         self.prevTime = pygame.time.get_ticks()
@@ -245,21 +246,21 @@ class player(combatEntity):
             if event.key == self.keyBindings[8] and self.bulletCount == 0:
                 # sound for reload
                 mixer.init()
-                pygame.mixer.music.load('Reload.mp3')
+                pygame.mixer.music.load('assets/sounds/Reload.mp3')
                 pygame.mixer.music.play(1)
                 self.bulletCount = self.data.gunSlots
 
             if event.key == self.keyBindings[3]:
                 # adding shooting sound
                 mixer.init()
-                pygame.mixer.music.load('Gun1.mp3')
+                pygame.mixer.music.load('assets/sounds/Gun1.mp3')
                 pygame.mixer.music.play(1)
                 self.meleeAttack(False)
 
             if event.key == self.keyBindings[4]:
                 # adding shooting sound 
                 mixer.init()
-                pygame.mixer.music.load('Gun2.mp3')
+                pygame.mixer.music.load('assets/sounds/Gun2.mp3')
                 pygame.mixer.music.play(1)
                 self.meleeAttack(True)
 
@@ -273,17 +274,14 @@ class player(combatEntity):
             '''temp code'''
             if event.key == self.keyBindings[13]:
                 self.lockedEnemy = (self.lockedEnemy + 1) % len(self.enemy)
-                print(self.lockedEnemy)
             '''temp code'''
             if event.key == self.keyBindings[9]:
                 self.attacks[self.slot]()
             '''Change - Slot'''
             if event.key == self.keyBindings[5]:
                 self.slot = (self.slot + 1) % len(self.attacks)
-                print(self.slot)
             elif event.key == self.keyBindings[6]:
                 self.slot = (self.slot - 1) % len(self.attacks)
-                print(self.slot)
         if event.type == pygame.MOUSEBUTTONDOWN:
             # Bullet
             if self.mouse[2] and not self.lock[0] and self.bulletCount > 0:
@@ -329,10 +327,6 @@ class player(combatEntity):
                     i.damage(int(30 * self.data.damageMultiplier), int(10 * self.data.stunMultiplier))
             print('[Player]: Whirl Wind Attack Success')
             self.magicBar.decrease(30)
-
-    def damage(self, hit, stun=0):
-        super(player, self).damage(hit=hit, stun=stun)
-        print(self.stunBar.currentLevel())
 
 
 class EnemyAI(combatEntity):
