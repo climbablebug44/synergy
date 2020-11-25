@@ -54,6 +54,9 @@ class spriteSheetManager(object):
                 imageList.append(pygame.transform.flip(image, True, False))
         return imageList
 
+    def __del__(self):
+        spriteSheetManager.count -= 1
+
 
 if __name__ == '__main__':
     spriteData = {
