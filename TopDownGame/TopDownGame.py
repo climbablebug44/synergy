@@ -138,9 +138,8 @@ class TopDownGame:
 
         # setting the player
         self.player = Player(screen_w, screen_h)
-        # player_filenames = ["player_idle2.png", "player_walk_front_right2.png", "player_idle2.png",
-        #                    "player_walk_front_left2.png"]
-        player_filenames = ["player_walk_front_right2.png", "player_walk_front_left2.png"]
+        player_filenames = ["player_idle2.png", "player_walk_front_right2.png", "player_idle2.png", "player_walk_front_left2.png"]
+        #player_filenames = ["player_walk_front_right2.png", "player_walk_front_left2.png"]
         for i in player_filenames:
             t_img = pygame.image.load('TopDownGame/' + i).convert()
             t_img.set_colorkey(t_img.get_at([5, 5]))
