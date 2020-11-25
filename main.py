@@ -78,6 +78,7 @@ def main():
         except ConnectionRefusedError:
             pass
         finally:
+            print(a)
             exit(1)
 
 
