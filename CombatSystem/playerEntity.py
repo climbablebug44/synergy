@@ -333,7 +333,7 @@ class EnemyAI(combatEntity):
     def __init__(self, *groups, ssmanager, platform, time):
         super().__init__(*groups, ssmanager=ssmanager, platform=platform, time=time)
         # self.image = pygame.transform.scale(pygame.image.load('assets/enemy.png'), self.rect.size)
-        self.idleAnimate = ssmanager.getOther('assets/Enemy-Dark_Wraith/idle.png', (0, 0, 0), (500, 100), 5,
+        self.idleAnimate = ssmanager.getOther('assets/Enemy-Dark_Wraith/idle.png', (255, 255, 255), (500, 100), 4,
                                               gc.playerSize, True)
         # somewhat working animation
         self.image = self.idleAnimate[0]
@@ -356,7 +356,7 @@ class EnemyAI(combatEntity):
 
     def update(self, *args, ):
         self.image = pygame.transform.flip(self.idleAnimate[self.i // 10], not self.facing, False)
-        self.i = (self.i + 1) % (10 * (len(self.idleAnimate) - 1))
+        self.i = (self.i + 1) % (10 * (len(self.idleAnimate)))
 
         self.rect = self.rect.move(self.velocity)
         '''Randomly Shoot towards player'''
