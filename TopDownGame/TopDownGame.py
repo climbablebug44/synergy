@@ -1,4 +1,4 @@
-# trying commiting from termianl
+# trying commiting from terminal
 
 import traceback
 
