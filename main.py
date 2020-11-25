@@ -8,6 +8,11 @@ import pygame
 from TopDownGame.TopDownGame import TopDownGame
 
 
+def updateFile(filename, data):
+    with open('common/temp/' + filename, 'w+') as fp:
+        fp.write(data)
+
+
 def main():
     # TODO: CHECK UPDATE FILES
     skt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -17,19 +22,28 @@ def main():
         updateAvailable = skt.recv(1024)
         skt.send('True'.encode())
         updateAvailable = updateAvailable.decode('ascii')
-        print(updateAvailable)
+
         if updateAvailable == "True":
-            filename = skt.recv(1024)
-            skt.send('True'.encode())
-            with open(filename, 'wb') as fileRepl:
-                x = skt.recv(1024)
-                fileRepl.write(x)
+            print('[GameLog]: Update Available, Updating')
+            filename = skt.recv(1024).decode('ascii')
+            skt.send(b't')
+            data = skt.recv(1024).decode('ascii')
+            print(filename, data)
+            try:
+                while True:
+                    data += skt.recv(1024).decode('ascii')
+            except ConnectionResetError:
+                pass
+            updateFile(filename, data)
+            print('[GameLog]: Update done')
         elif updateAvailable == 'False':
-            print('no update available')
+            print('[GameLog]: No update available, Game already updated')
         else:
-            print('Garbage recieved')
+            print('[GameLog]: Garbage received')
     except ConnectionRefusedError:
-        print('Server not found')
+        print('[GameLog]: Server not found')
+    finally:
+        skt.close()
 
     try:
         pygame.init()
@@ -58,12 +72,12 @@ def main():
         skt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             skt.connect(('localhost', 8081))
+            skt.send(b'ERROR')
             skt.send(a.encode())
-            print(a)
+            print('Error report sent')
         except ConnectionRefusedError:
             pass
         finally:
-            print(a)
             exit(1)
 
 

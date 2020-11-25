@@ -6,27 +6,27 @@ sock.bind(('localhost', 8081))
 sock.listen(20)
 
 update_file = ['file1.py']
-updateAvailable = 'False'
+updateAvailable = 'True'
 
 while True:
+    conn, addr = sock.accept()
     try:
-        conn, addr = sock.accept()
         data = conn.recv(1024).decode('ascii')
-        if data == 'ERROR':
+        if data[:5] == 'ERROR':
+            print('[Log Entry]: '+addr[0]+':'+str(addr[1])+' Exception caught')
             with open('log.txt', 'a') as f:
                 f.write(data)
         elif data == 'UPDATE':
-            print('update')
+            print('[Log Entry]: '+addr[0]+':'+str(addr[1])+' Checking/Sending Updates')
             conn.send(updateAvailable.encode())
-            # TODO: SENDING UPDATE FILES
-            '''for i in update_file:
-                conn.send(i.encode())
-                x = conn.recv(1024).decode('ascii')
-                with open(i, 'rb') as file:
-                    conn.send(file.read())'''
+            conn.send(update_file[0].encode())
+            conn.recv(1)
+            with open(update_file[0]) as fp:
+                conn.send(fp.read().encode())
+        conn.close()
 
     except KeyboardInterrupt:
-        sock.close()
+        conn.close()
         break
     except Exception as e:
         print(e)
