@@ -2,7 +2,7 @@ import pygame
 from CombatSystem import playerEntity
 from common import gameConstants as c
 from CombatSystem.spriteSheetManager import spriteSheetManager
-
+from pygame import mixer
 
 class combatGame(object):
     def __init__(self, size, screen):
@@ -71,6 +71,7 @@ class combatGame(object):
         self.screen.blit(text_surface, text_rect)
 
     def mainLoop(self):
+        mixer.init()
         pygame.mixer.music.load('assets/sounds/Deal.mp3')
         pygame.mixer.music.play(-1)
         volume = 0.7
