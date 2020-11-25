@@ -319,7 +319,7 @@ class OptionsMenu(Menu):
             self.game.window.blit(self.game.display, (0, 0))
             mouse = pygame.mouse.get_pos()
             smallfont = pygame.font.SysFont('Corbel', 18)
-            text = smallfont.render('0', True, [255, 255, 255])
+            text = smallfont.render('0.5', True, [255, 255, 255])
             pygame.draw.rect(self.game.window, [48, 48, 48], [380, 195, 65, 15])
             self.game.window.blit(text, (410, 194))
             
@@ -343,7 +343,7 @@ class OptionsMenu(Menu):
             self.game.window.blit(text,(460,194))
             
             smallfont = pygame.font.SysFont('Corbel', 18)
-            text = smallfont.render('0', True, [255, 255, 255])
+            text = smallfont.render('0.7', True, [255, 255, 255])
             pygame.draw.rect(self.game.window, [48, 48, 48], [380, 265, 65, 15])
             self.game.window.blit(text, (410, 264))
             
