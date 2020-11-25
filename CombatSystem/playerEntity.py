@@ -3,7 +3,7 @@ import pygame
 import random
 from CombatSystem import projectiles, collectibles, screenElements, currentConfigurations
 from common import gameConstants as gc, keyBinding
-
+from pygame import mixer
 
 class deltaTime:
     def __init__(self):
@@ -244,20 +244,23 @@ class player(combatEntity):
                 self.magicBar.decrease(20)
             if event.key == self.keyBindings[8] and self.bulletCount == 0:
                 # sound for reload
-                # Reload_sound = pygame.mixer.Sound('Reload.mp3')
-                # pygame.mixer.Sound.play(Reload_sound)
+                mixer.init()
+                pygame.mixer.music.load('Reload.mp3')
+                pygame.mixer.music.play(1)
                 self.bulletCount = self.data.gunSlots
 
             if event.key == self.keyBindings[3]:
                 # adding shooting sound
-                # crash_sound = pygame.mixer.Sound('Gun1.mp3')
-                # pygame.mixer.Sound.play(crash_sound)
+                mixer.init()
+                pygame.mixer.music.load('Gun1.mp3')
+                pygame.mixer.music.play(1)
                 self.meleeAttack(False)
 
             if event.key == self.keyBindings[4]:
                 # adding shooting sound 
-                # crash_sound = pygame.mixer.Sound('Gun2.mp3')
-                # pygame.mixer.Sound.play(crash_sound)
+                mixer.init()
+                pygame.mixer.music.load('Gun2.mp3')
+                pygame.mixer.music.play(1)
                 self.meleeAttack(True)
 
             if self.lock[0] and self.keys[self.keyBindings[11]] and self.bulletCount > 0:
