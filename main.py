@@ -50,8 +50,8 @@ def main():
         screen = pygame.display.set_mode(gc.screenSize)
         print(screen.get_size())
         Running = True
+        g = gameScreen(screen)
         while Running:
-            g = gameScreen(screen)
             # TODO: Top Cam Game
             g = TopDownGame(screen)
             g.TopDownGameLoop()
@@ -63,7 +63,7 @@ def main():
                 # TODO: CONTINUE GAME WON FROM ENEMY
             else:
                 print('You lost')
-                Running = False
+                # Running = False
                 # TODO: LOAD LAST CHECKPOINT, LOST FROM ENEMY
 
     except Exception as ex:
