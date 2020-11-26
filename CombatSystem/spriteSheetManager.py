@@ -1,5 +1,4 @@
 import pygame
-import pickle
 
 
 class spriteSheetManager(object):

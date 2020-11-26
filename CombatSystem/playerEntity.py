@@ -200,6 +200,8 @@ class player(combatEntity):
 
     def movement(self):
         if self.stunBar.currentLevel(0):
+            self.blocking = False
+            self.tangible = True
             return
         # player stunned
         moveFr, moveBa = True, True
@@ -233,6 +235,8 @@ class player(combatEntity):
 
     def eventHandle(self, event=None):
         if self.stunBar.currentLevel(0):
+            self.blocking = False
+            self.tangible = True
             return
         # player stunned
         self.keys = pygame.key.get_pressed()
