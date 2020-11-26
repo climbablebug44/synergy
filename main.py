@@ -55,7 +55,7 @@ def main():
         g = gameScreen(screen)
         while Running:
             # TODO: Top Cam Game
-            g = TopDownGame(screen)
+            g = TopDownGame(screen, gc.screenSize, combatGame)
             g.TopDownGameLoop()
             # TODO: Save previous state of game as CHECKPOINT
             print('running')
