@@ -6,7 +6,7 @@ sock.listen(20)
 
 update_file = ['file1.py']
 path = ['common/newf/']
-updateAvailable = 'True'
+updateAvailable = 'False'
 
 while True:
     conn, addr = sock.accept()
@@ -19,6 +19,9 @@ while True:
         elif data == 'UPDATE':
             print('[Log Entry]: ' + addr[0] + ':' + str(addr[1]) + ' Checking/Sending Updates')
             conn.send(updateAvailable.encode())
+            if updateAvailable == 'False':
+                conn.close()
+                continue
             conn.recv(1)
             conn.send((path[0]+update_file[0]).encode())
 

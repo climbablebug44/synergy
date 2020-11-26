@@ -46,6 +46,7 @@ def main():
         skt.close()
 
     try:
+        # raise Exception('hello')
         pygame.init()
         screen = pygame.display.set_mode(gc.screenSize)
         print(screen.get_size())
