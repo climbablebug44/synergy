@@ -54,4 +54,5 @@ I-green_map/tree_withf.png,482,426,0.0,2.5937424601000023,c=True,'s = self.stati
 I-green_map/tree_withf.png,687,431,0.0,2.5937424601000023,c=True,'s = self.static_list[0].getText()\nif s[0] != "[":\n\tc = int(s[39:])+1\n\tself.static_list[0].setText(s[:39]+str(c))\n\tif c == 5:\n\t\tself.static_list[0].setText("[COMPLETE]" + self.static_list[0].getText()[8:])\ni.oncollide = ""'
 I-green_map/tree_withf.png,888,432,0.0,2.5937424601000023,c=True,'s = self.static_list[0].getText()\nif s[0] != "[":\n\tc = int(s[39:])+1\n\tself.static_list[0].setText(s[:39]+str(c))\n\tif c == 5:\n\t\tself.static_list[0].setText("[COMPLETE]" + self.static_list[0].getText()[8:])\ni.oncollide = ""'
 I-green_map/tree_withf.png,1087,432,0.0,2.5937424601000023,c=True,'s = self.static_list[0].getText()\nif s[0] != "[":\n\tc = int(s[39:])+1\n\tself.static_list[0].setText(s[:39]+str(c))\n\tif c == 5:\n\t\tself.static_list[0].setText("[COMPLETE]" + self.static_list[0].getText()[8:])\ni.oncollide = ""'
+I-green_map/pool.png,268,200,0,2.5937424601000023,c=True,'self.combatGame(self.screenSize, self.screen)\nmoved[0] -= 200\nmoved_old[0]-=200'
 T-Task 1 : Collect 5 fruites : Fruites : 0,4,9
