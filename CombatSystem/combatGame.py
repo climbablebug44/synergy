@@ -4,44 +4,37 @@ from common import gameConstants as c
 from CombatSystem.spriteSheetManager import spriteSheetManager
 from pygame import mixer
 
+
 class combatGame(object):
     def __init__(self, size, screen):
         self.clock = pygame.time.Clock()
-        self.sSManager = spriteSheetManager()
+        # self.sSManager = spriteSheetManager()
         self.screen = screen
         self.size = size
         self.allSprites = pygame.sprite.Group()
         self.platform = pygame.Rect(0, size[1] - 100, size[0], 50)
         self.playingEntities = pygame.sprite.Group()
-        self.player = playerEntity.player(self.playingEntities, self.allSprites, ssmanager=self.sSManager,
-                                          platform=self.platform, time=self.clock)
-        self.enemy = playerEntity.EnemyAI(self.playingEntities, self.allSprites, ssmanager=self.sSManager,
-                                          platform=self.platform, time=self.clock)
+        self.player = playerEntity.player(self.playingEntities, self.allSprites, platform=self.platform,
+                                          time=self.clock)
+        self.enemy = playerEntity.EnemyAI(self.playingEntities, self.allSprites, platform=self.platform,
+                                          time=self.clock)
         self.enemy2 = playerEntity.smallFlyingEnemySpawner(self.playingEntities, self.allSprites,
-                                                           ssmanager=self.sSManager, platform=self.platform,
+                                                           platform=self.platform,
                                                            time=self.clock)
-        self.bg = self.sSManager.getOther('assets/bg.png', (0, 0, 0), (2400, 600), 3, (800, 600), True)
+        self.bg = spriteSheetManager.get('assets/bg.png', (0, 0, 0), (2400, 600), 3, (800, 600), True)
         self.running = True
-
-        self.i = 0
-        # Mainloop Starts Here: ->
+        # Mainloop for combat starts Here: ->
         self.state = self.mainLoop()
 
     def constructBackground(self):
         """
-                Code for Drawing the background
-                # bg = self.sSManager.getOther('assets/bg.png(location of asset)', (size of image as tuple (x,y)),
-                # 1(number of sprites it has horizontally), (size of out required as tuple(x,y),
-                # True(False to flip(mirror image) ))
-                # self.screen.blit(bg[0], (0, 0))
-
-                """
+                Write code for Drawing the background / other stationary sprites
+        """
         '''
             For many sprites that have different positions but same image, blitting saves more space and makes more
             sense.
             TODO: blit other background elements
         '''
-
         self.screen.blit(self.bg[0], (0, 0))
 
     def pause(self):
@@ -71,10 +64,6 @@ class combatGame(object):
         self.screen.blit(text_surface, text_rect)
 
     def mainLoop(self):
-        mixer.init()
-        pygame.mixer.music.load('assets/sounds/Deal.mp3')
-        pygame.mixer.music.play(-1)
-        volume = 0.7
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -84,14 +73,6 @@ class combatGame(object):
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     self.pause()
                     # TODO: pause
-                # setting for inc/dec volume
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_v:
-                    if 0 < volume <= 1:
-                        volume = volume + 0.1
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_b:
-                    if volume > 0:
-                        volume = volume - 0.1
-            pygame.mixer.music.set_volume(volume)
             self.screen.fill(c.color['BLACK'])
             self.constructBackground()  # Draws background
             self.allSprites.update()
@@ -109,8 +90,6 @@ class combatGame(object):
 
             result = self.checkResult()
             if result is not None:
-                self.sSManager = None
-                pygame.mixer.music.stop()
                 return result
 
     def checkResult(self):

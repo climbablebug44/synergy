@@ -1,10 +1,10 @@
+import pygame
 import datetime
 import traceback
 import socket
 from CombatSystem.combatGame import combatGame
 from common import gameConstants as gc
 from Screens.game import Game as gameScreen
-import pygame
 from TopDownGame.TopDownGame import TopDownGame
 
 
@@ -47,7 +47,6 @@ def main():
         skt.close()
 
     try:
-        # raise Exception('hello')
         pygame.init()
         screen = pygame.display.set_mode(gc.screenSize)
         print(screen.get_size())

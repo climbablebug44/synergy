@@ -3,7 +3,7 @@ import pygame
 
 class spriteSheetManager(object):
     @staticmethod
-    def getOther(filename, colorKey, size, noOfSprites, sizeOut, direction):
+    def get(filename, colorKey, size, noOfSprites, sizeOut, direction):
         spriteSheet = pygame.transform.scale(pygame.image.load(filename).convert(),
                                              (sizeOut[0] * noOfSprites, sizeOut[1]))
         imageList = []

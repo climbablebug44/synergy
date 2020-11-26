@@ -1,6 +1,7 @@
 from Screens.menu import *
 import common.gameConstants as gc
 
+
 class Game:
     def __init__(self, screen):
         pygame.init()
@@ -26,7 +27,6 @@ class Game:
                 self.playing = False
                 self.running = False
             self.display.fill(self.BLACK)
-            # self.draw_text('Thanks for Playing', 20, self.DISPLAY_W / 2, self.DISPLAY_H / 2)
             self.window.blit(self.display, (0, 0))
             pygame.display.update()
             self.reset_keys()

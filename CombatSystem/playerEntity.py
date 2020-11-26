@@ -1,7 +1,7 @@
 import math
 import pygame
 import random
-from CombatSystem import projectiles, collectibles, screenElements, currentConfigurations
+from CombatSystem import projectiles, collectibles, screenElements, currentConfigurations, spriteSheetManager
 from common import gameConstants as gc, keyBinding
 from pygame import mixer
 
@@ -55,14 +55,13 @@ class attackCooldown:
 
 
 class combatEntity(pygame.sprite.Sprite):
-    def __init__(self, *groups, ssmanager, platform, time):
+    def __init__(self, *groups, platform, time):
         super().__init__(*groups)
         self.rect = pygame.Rect(0, 0, gc.playerSize[0], gc.playerSize[1])
         # print(self.size[0], self.rect.width) # 75
         # print(self.size[1], self.rect.height) # 150
         self.clock = time
         self.gravity = 1
-        self.sSManager = ssmanager
         self.velocity = [0, 0]
         self.health = 375
         self.jumping = True
@@ -126,8 +125,8 @@ class combatEntity(pygame.sprite.Sprite):
 
 
 class player(combatEntity):
-    def __init__(self, *groups, ssmanager, platform, time):
-        super().__init__(*groups, ssmanager=ssmanager, platform=platform, time=time)
+    def __init__(self, *groups, platform, time):
+        super().__init__(*groups, platform=platform, time=time)
         self.keyBindings = keyBinding.keyBinding().get()
         '''
         keybinding help: 
@@ -259,22 +258,22 @@ class player(combatEntity):
 
             if event.key == self.keyBindings[3]:
                 # adding shooting sound
-                mixer.init()
+                '''mixer.init()
                 pygame.mixer.music.load('assets/sounds/Gun1.mp3')
                 pygame.mixer.music.play(1)
                 # newly added
                 pygame.mixer.music.load('assets/sounds/Deal.mp3')
-                pygame.mixer.music.play(-1)
+                pygame.mixer.music.play(-1)'''
                 self.meleeAttack(False)
 
             if event.key == self.keyBindings[4]:
                 # adding shooting sound 
-                mixer.init()
+                '''mixer.init()
                 pygame.mixer.music.load('assets/sounds/Gun2.mp3')
                 pygame.mixer.music.play(1)
                 # newly added
                 pygame.mixer.music.load('assets/sounds/Deal.mp3')
-                pygame.mixer.music.play(-1)
+                pygame.mixer.music.play(-1)'''
                 self.meleeAttack(True)
 
             if self.lock[0] and self.keys[self.keyBindings[11]] and self.bulletCount > 0:
@@ -343,23 +342,26 @@ class player(combatEntity):
 
 
 class EnemyAI(combatEntity):
-    def __init__(self, *groups, ssmanager, platform, time):
-        super().__init__(*groups, ssmanager=ssmanager, platform=platform, time=time)
+    def __init__(self, *groups, platform, time):
+        super().__init__(*groups, platform=platform, time=time)
         # self.image = pygame.transform.scale(pygame.image.load('assets/enemy.png'), self.rect.size)
-        self.idleAnimate = ssmanager.getOther('assets/Enemy-Dark_Wraith/idle.png', (255, 255, 255), (500, 100), 4,
-                                              gc.playerSize, True)
+        self.idleAnimate = spriteSheetManager.spriteSheetManager.get('assets/Enemy-Dark_Wraith/idle.png',
+                                                                     (255, 255, 255), (500, 100), 4, gc.playerSize,
+                                                                     True)
+        self.heavyAttackAnimate = spriteSheetManager.spriteSheetManager.get(
+            'assets/Enemy-Dark_Wraith/HeavyAttack.png', (255, 255, 255), (500, 100), 7, gc.playerSize, True)
         # somewhat working animation
         self.image = self.idleAnimate[0]
-        self.i = 0
+        self.animationVariable = 0
         self.rect.x = 500
         self.walking = False
         self.invisibleRect = pygame.rect.Rect(self.rect.x - 50, self.rect.y, 225, self.rect.height)
         self.player = None
-
-        self.healthBar = screenElements.healthBar(self.group, entity=self,
-                                                  position=(),
-                                                  colors=(gc.color['GREEN'], gc.color["RED"]),
-                                                  size=(gc.playerSize[0], 5), maxL=self.health)
+        self.healthBar = screenElements.healthBar(
+            self.group, entity=self, position=(),
+            colors=(gc.color['GREEN'], gc.color["RED"]),
+            size=(gc.playerSize[0], 5), maxL=self.health
+        )
 
         '''Get player'''
         for i in self.group[0]:
@@ -367,11 +369,23 @@ class EnemyAI(combatEntity):
                 self.player = i
                 break
 
-    def update(self, *args, ):
-        self.image = pygame.transform.flip(self.idleAnimate[self.i // 10], not self.facing, False)
-        self.i = (self.i + 1) % (10 * (len(self.idleAnimate)))
+    def animate(self):
+        self.image = pygame.transform.flip(self.idleAnimate[self.animationVariable // 10], not self.facing, False)
+        self.animationVariable = (self.animationVariable + 1) % (10 * (len(self.idleAnimate)))
 
+    def move(self):
         self.rect = self.rect.move(self.velocity)
+
+    def orient(self):
+        """Orient Self facing towards player"""
+        if self.player.rect.x > self.rect.x:
+            self.facing = True
+        else:
+            self.facing = False
+
+    def update(self, *args, ):
+        self.animate()
+        self.move()
         '''Randomly Shoot towards player'''
         if not self.stunBar.currentLevel(0):
             if random.randint(0, 5000) < 3:
@@ -383,12 +397,7 @@ class EnemyAI(combatEntity):
                     self.walking = False
                 else:
                     self.moveInDirection(not self.facing)
-
-            '''Orient Self facing towards player'''
-            if self.player.rect.x > self.rect.x:
-                self.facing = True
-            else:
-                self.facing = False
+            self.orient()
 
             '''Check player too close - then attack'''
             if self.invisibleRect.colliderect(self.player.rect) and random.randint(0, 10) == 1:
@@ -495,8 +504,8 @@ class EnemyAI(combatEntity):
 
 
 class smallFlyingEnemySpawner(EnemyAI):
-    def __init__(self, *groups, ssmanager, platform, time):
-        super().__init__(*groups, ssmanager=ssmanager, platform=platform, time=time)
+    def __init__(self, *groups, platform, time):
+        super().__init__(*groups, platform=platform, time=time)
         self.rect.y = 200
         self.finalPos = 0
         self.image = pygame.transform.scale(pygame.image.load('assets/bird.png'), (50, 50))
@@ -514,8 +523,7 @@ class smallFlyingEnemySpawner(EnemyAI):
 
     def update(self, *args):
         if self.replicate.delta(5000) and smallFlyingEnemySpawned.count < 20:
-            smallFlyingEnemySpawned(*self.group, ssmanager=self.sSManager,
-                                    platform=self.platform, time=self.clock, x=self.rect.x)
+            smallFlyingEnemySpawned(*self.group, platform=self.platform, time=self.clock, x=self.rect.x)
         self.rect.y = 100 + 5 * math.sin((pygame.time.get_ticks() % 43200) // 120)
         if self.rect.x != self.finalPos:
             if self.rect.x < self.finalPos:
@@ -538,8 +546,8 @@ class smallFlyingEnemySpawner(EnemyAI):
 class smallFlyingEnemySpawned(EnemyAI):
     count = 0
 
-    def __init__(self, *groups, ssmanager, platform, time, x):
-        super().__init__(*groups, ssmanager=ssmanager, platform=platform, time=time)
+    def __init__(self, *groups, platform, time, x):
+        super().__init__(*groups, platform=platform, time=time)
         smallFlyingEnemySpawned.count += 1
         self.finalPos = 0
         self.image = pygame.transform.scale(pygame.image.load('assets/bird.png'), (50, 50))

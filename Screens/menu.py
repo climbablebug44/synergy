@@ -57,7 +57,7 @@ class MainMenu(Menu):
                 self.state = 'Exit'
             elif self.state == 'Exit':
                 self.cursor_rect.midtop = (self.startx + self.offset, self.starty)
-                self.state == 'Start'
+                self.state = 'Start'
         elif self.game.UP_KEY:
             if self.state == 'Start':
                 self.cursor_rect.midtop = (self.mid_w + self.offset, self.mid_h + 130)
@@ -89,12 +89,28 @@ class MainMenu(Menu):
 class OptionsMenu(Menu):
     def __init__(self, game):
         Menu.__init__(self, game)
+        self.controlNames = ['Walk Left', 'Walk Right', 'Block', 'Light Attack', 'Heavy Attack', 'Slot toggle UP',
+                             'Slot Toggle Down', 'Jump', 'Reload', 'Special', 'Push', 'Auto-Aim Shoot',
+                             'Toggle Auto aim', 'Toggle selected enemy']
         self.state = 'Volume'
         self.volx, self.voly = self.mid_w, self.mid_h + 20
         self.controlsx, self.controlsy = self.mid_w, self.mid_h + 45
         self.cursor_rect.midtop = (self.volx + self.offset, self.voly)
-        # self.x, self.y, self.z, self.l, self.m, self.n, self.b, self.v, self.o, self.g = 'W', 'S', 'A', 'D', 'P', 'C', 'U', 'I', 'Space', 'Q'
-        self.keys = ['W', 'S', 'A', 'D', 'P', 'C', 'U', 'I', 'Space','E','B','Q','Done']
+        self.keys = ['W', 'S', 'A', 'D', 'P', 'C', 'U', 'I', 'Space', 'E', 'B', 'Q', 'Done']
+
+    @staticmethod
+    def convertKeytoText(key):
+        c = chr(key)
+        if c.isalnum():
+            return c
+        elif key == pygame.K_SPACE:
+            return 'Space'
+        elif key == pygame.K_LCTRL:
+            return 'L-Ctrl'
+        elif key == pygame.K_BACKSPACE:
+            return 'BKSP'
+        else:
+            return c
 
     def display_menu(self):
         self.run_display = True
@@ -127,7 +143,6 @@ class OptionsMenu(Menu):
             self.control()
         elif self.game.START_KEY and self.state == 'Volume':
             self.Volume_control()
-    
 
     def control(self):
         self.run_display = True
@@ -135,7 +150,10 @@ class OptionsMenu(Menu):
             self.game.check_events()
             self.game.display.fill((0, 0, 0))
             self.game.draw_text('Controls', 20, 50, 25)
-            self.game.draw_text('Move Forward ', 15, 200, 50)
+            # <-
+            for controls in range(12):
+                self.game.draw_text(self.controlNames[controls], 15, 200, 50 + (controls * 30))
+            '''self.game.draw_text('Move Forward ', 15, 200, 50)
             self.game.draw_text('Move Backward', 15, 190, 80)
             self.game.draw_text('Left Move', 15, 210, 110)
             self.game.draw_text('Right Move', 15, 210, 140)
@@ -144,9 +162,10 @@ class OptionsMenu(Menu):
             self.game.draw_text('Cam Up', 15, 210, 230)
             self.game.draw_text('Side Cam', 15, 210, 260)
             self.game.draw_text('Backspace', 15, 205, 290)
-            self.game.draw_text('Speed Up',15,210,320)
-            self.game.draw_text('Fire ',15,230,350)
-            self.game.draw_text('Quit', 15, 220, 380)
+            self.game.draw_text('Speed Up', 15, 210, 320)
+            self.game.draw_text('Fire ', 15, 230, 350)
+            self.game.draw_text('Quit', 15, 220, 380)'''
+            # ->
             self.game.window.blit(self.game.display, (0, 0))
             self.Change_controls()
             mouse = pygame.mouse.get_pos()
@@ -224,7 +243,7 @@ class OptionsMenu(Menu):
             else:
                 pygame.draw.rect(self.game.window, [128, 123, 200], [255, 310, 65, 16])
             self.game.window.blit(text, (280, 310))
-            
+
             text = smallfont.render(self.keys[10], True, [255, 255, 255])
             if 255 <= mouse[0] <= 320 and 340 <= mouse[1] <= 356:
                 pygame.draw.rect(self.game.window, [120, 209, 147], [255, 340, 65, 16])
@@ -238,7 +257,7 @@ class OptionsMenu(Menu):
             else:
                 pygame.draw.rect(self.game.window, [128, 123, 200], [255, 370, 65, 16])
             self.game.window.blit(text, (280, 370))
-            
+
             text = smallfont.render(self.keys[12], True, [255, 255, 255])
             if 255 <= mouse[0] <= 330 and 450 <= mouse[1] <= 476:
                 pygame.draw.rect(self.game.window, [163, 114, 202], [255, 450, 85, 26])
@@ -278,7 +297,7 @@ class OptionsMenu(Menu):
                 if 255 <= mouse[0] <= 320 and 340 <= mouse[1] <= 356:
                     self.keys[10] = self.getKeyPress()
                 if 255 <= mouse[0] <= 320 and 370 <= mouse[1] <= 386:
-                    self.keys[11] = self.getKeyPress()    
+                    self.keys[11] = self.getKeyPress()
                 if 255 <= mouse[0] <= 330 and 450 <= mouse[1] <= 476:
                     self.game.BACK_KEY = True
                     self.run_display = False
@@ -304,6 +323,7 @@ class OptionsMenu(Menu):
                 return 'L-Ctrl'
             elif key == pygame.K_RCTRL:
                 return 'R-Ctrl'
+
     # For  accesing volumw controls
     def Volume_control(self):
         self.run_display = True
@@ -314,59 +334,59 @@ class OptionsMenu(Menu):
             image1 = pygame.transform.scale(image1, (420, 120))
             self.game.window.blit(image1, (200, 0))
             pygame.display.update()
-            self.game.draw_text('Music',28,300,200)
-            self.game.draw_text('Bullets',28,295,270)
+            self.game.draw_text('Music', 28, 300, 200)
+            self.game.draw_text('Bullets', 28, 295, 270)
             self.game.window.blit(self.game.display, (0, 0))
             mouse = pygame.mouse.get_pos()
             smallfont = pygame.font.SysFont('Corbel', 18)
             text = smallfont.render('0.5', True, [255, 255, 255])
             pygame.draw.rect(self.game.window, [48, 48, 48], [380, 195, 65, 15])
             self.game.window.blit(text, (410, 194))
-            
+
             smallfont = pygame.font.SysFont('Corbel', 18)
             text = smallfont.render("-", True, [255, 255, 255])
-            if 350<=mouse[0]<=370 and 195<=mouse[1]<=210:
-                pygame.draw.rect(self.game.window,[66, 168, 147],[350,195,20,15])
+            if 350 <= mouse[0] <= 370 and 195 <= mouse[1] <= 210:
+                pygame.draw.rect(self.game.window, [66, 168, 147], [350, 195, 20, 15])
                 '''if(self.x[0]>0):
                     self.x[0]=self.x[0]-1'''
             else:
-                 pygame.draw.rect(self.game.window,[48,48,48],[350,195,20,15])
-            self.game.window.blit(text,(357,194))
-            
+                pygame.draw.rect(self.game.window, [48, 48, 48], [350, 195, 20, 15])
+            self.game.window.blit(text, (357, 194))
+
             smallfont = pygame.font.SysFont('Corbel', 18)
             text = smallfont.render("+", True, [255, 255, 255])
-            if 455<=mouse[0]<=475 and 195<=mouse[1]<=210:
-                pygame.draw.rect(self.game.window,[66, 168, 147],[455,195,20,15])
-                #self.x=self.x+1
+            if 455 <= mouse[0] <= 475 and 195 <= mouse[1] <= 210:
+                pygame.draw.rect(self.game.window, [66, 168, 147], [455, 195, 20, 15])
+                # self.x=self.x+1
             else:
-                pygame.draw.rect(self.game.window,[48,48,48],[455,195,20,15])
-            self.game.window.blit(text,(460,194))
-            
+                pygame.draw.rect(self.game.window, [48, 48, 48], [455, 195, 20, 15])
+            self.game.window.blit(text, (460, 194))
+
             smallfont = pygame.font.SysFont('Corbel', 18)
             text = smallfont.render('0.7', True, [255, 255, 255])
             pygame.draw.rect(self.game.window, [48, 48, 48], [380, 265, 65, 15])
             self.game.window.blit(text, (410, 264))
-            
+
             smallfont = pygame.font.SysFont('Corbel', 18)
             text = smallfont.render("-", True, [255, 255, 255])
-            if 350<=mouse[0]<=370 and 265<=mouse[1]<=280:
-                pygame.draw.rect(self.game.window,[66, 168, 147],[350,265,20,15])
+            if 350 <= mouse[0] <= 370 and 265 <= mouse[1] <= 280:
+                pygame.draw.rect(self.game.window, [66, 168, 147], [350, 265, 20, 15])
                 '''if(self.x[1]>0):
                     self.x[1]=self.x[1]-1'''
             else:
-                pygame.draw.rect(self.game.window,[48,48,48],[350,265,20,15])
-            self.game.window.blit(text,(357,264))
-            
+                pygame.draw.rect(self.game.window, [48, 48, 48], [350, 265, 20, 15])
+            self.game.window.blit(text, (357, 264))
+
             smallfont = pygame.font.SysFont('Corbel', 18)
             text = smallfont.render("+", True, [255, 255, 255])
-            if 455<=mouse[0]<=475 and 265<=mouse[1]<=280:
-                pygame.draw.rect(self.game.window,[66, 168, 147],[455,265,20,15])
-                #self.x[1]=self.x[1]+1
+            if 455 <= mouse[0] <= 475 and 265 <= mouse[1] <= 280:
+                pygame.draw.rect(self.game.window, [66, 168, 147], [455, 265, 20, 15])
+                # self.x[1]=self.x[1]+1
             else:
-                pygame.draw.rect(self.game.window,[48,48,48],[455,265,20,15])
-            
-            self.game.window.blit(text,(460,264))
-            
+                pygame.draw.rect(self.game.window, [48, 48, 48], [455, 265, 20, 15])
+
+            self.game.window.blit(text, (460, 264))
+
             for ev in pygame.event.get():
                 if ev.type == pygame.QUIT:
                     pygame.quit()
