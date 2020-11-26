@@ -9,7 +9,7 @@ from TopDownGame.TopDownGame import TopDownGame
 
 
 def updateFile(filename, data):
-    with open('common/temp/' + filename, 'w+') as fp:
+    with open(filename, 'w+') as fp:
         fp.write(data)
 
 
@@ -17,10 +17,10 @@ def main():
     # TODO: CHECK UPDATE FILES
     skt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
-        skt.connect(('localhost', 8081))
+        skt.connect(('localhost', 8083))
         skt.send('UPDATE'.encode())
         updateAvailable = skt.recv(1024)
-        skt.send('True'.encode())
+        skt.send('T'.encode())
         updateAvailable = updateAvailable.decode('ascii')
 
         if updateAvailable == "True":
@@ -28,7 +28,6 @@ def main():
             filename = skt.recv(1024).decode('ascii')
             skt.send(b't')
             data = skt.recv(1024).decode('ascii')
-            print(filename, data)
             try:
                 while True:
                     data += skt.recv(1024).decode('ascii')
@@ -40,6 +39,7 @@ def main():
             print('[GameLog]: No update available, Game already updated')
         else:
             print('[GameLog]: Garbage received')
+            print(updateAvailable)
     except ConnectionRefusedError:
         print('[GameLog]: Server not found')
     finally:
@@ -71,12 +71,12 @@ def main():
         a = "[" + str(datetime.datetime.now()) + "]\n" + a + "\n\n"
         skt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
-            skt.connect(('localhost', 8081))
+            skt.connect(('localhost', 8083))
             skt.send(b'ERROR')
             skt.send(a.encode())
             print('Error report sent')
         except ConnectionRefusedError:
-            pass
+            print('[GameLog]: Error - Server not found')
         finally:
             print(a)
             exit(1)
