@@ -6,7 +6,7 @@ sock.listen(20)
 
 update_file = ['file1.py']
 path = ['common/newf/']
-updateAvailable = 'False'
+updateAvailable = 'True'
 
 while True:
     conn, addr = sock.accept()
@@ -24,7 +24,7 @@ while True:
                 continue
             conn.recv(1)
             conn.send((path[0]+update_file[0]).encode())
-
+            conn.recv(1)
             with open(update_file[0]) as fp:
                 conn.send(fp.read().encode())
         conn.close()

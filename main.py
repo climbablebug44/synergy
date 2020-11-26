@@ -25,6 +25,7 @@ def main():
 
         if updateAvailable == "True":
             print('[GameLog]: Update Available, Updating')
+            skt.send(b't')
             filename = skt.recv(1024).decode('ascii')
             skt.send(b't')
             data = skt.recv(1024).decode('ascii')
