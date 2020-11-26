@@ -103,10 +103,12 @@ class Player:
 
 
 class TopDownGame:
-    def __init__(self, screen):
+    def __init__(self, screen, screenSize, combatGame):
         global font
         pygame.display.set_caption("TopDonwGame")
         self.screen = screen
+        self.screenSize = screenSize
+        self.combatGame = combatGame
         self.background_color = WHITE
         self.sprite_list = []
         self.static_list = []
