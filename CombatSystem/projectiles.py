@@ -21,7 +21,7 @@ class bullets(projectiles):
         super().__init__(*groups, creator=creator)
         self.velocity = vel
         self.rect = pygame.Rect(self.creator.rect.x, self.creator.rect.y + 25, 10, 10)
-        self.image = pygame.transform.scale(pygame.image.load('assets/blank.png'), (5, 5))
+        self.image = pygame.transform.scale(pygame.image.load('assets/bullet.png'), (5, 3))
         if vel is None:
             self.kill()
 
