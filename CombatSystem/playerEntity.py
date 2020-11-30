@@ -148,7 +148,6 @@ class player(combatEntity):
         self.keys = pygame.key.get_pressed()
         self.mouse = pygame.mouse.get_pressed()
         self.bulletCount = self.data.gunSlots
-        self.image = pygame.transform.scale(pygame.image.load('assets/player.png'), self.rect.size)
         self.magicBar = attackCooldown(self.data.maxCapacityMagicBar)  # Max Capacity
         self.enemy = []
         self.attacks = [self.dashAttack, self.chargedAttack, self.whirlWindStrike]
@@ -163,8 +162,15 @@ class player(combatEntity):
         self.stunDisplay = screenElements.stunBar(self.group, entity=self, position=(gc.screenSize[0] // 10, 20),
                                                   size=(gc.screenSize[0] // 2, 10),
                                                   maxlevel=self.stunBar.currentLevel())
+        arr = ['assets/Player/adventurer-idle-00.png', 'assets/Player/adventurer-idle-01.png',
+               'assets/Player/adventurer-idle-02.png']
+        self.idleAnimate = list(map(lambda x: pygame.transform.scale(pygame.image.load(x), gc.playerSize), arr))
+        self.image = self.idleAnimate[0]
+        self.animationVariable = 0
 
     def update(self):
+        self.animationVariable = (self.animationVariable + 1) % (len(self.idleAnimate) * 10)
+        self.image = pygame.transform.flip(self.idleAnimate[self.animationVariable // 10], not self.facing, False)
         self.rect = self.rect.move(self.velocity)
         # cheat code
         if pygame.key.get_pressed()[pygame.K_F1]:
