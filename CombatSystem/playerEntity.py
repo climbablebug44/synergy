@@ -165,12 +165,25 @@ class player(combatEntity):
         arr = ['assets/Player/adventurer-idle-00.png', 'assets/Player/adventurer-idle-01.png',
                'assets/Player/adventurer-idle-02.png']
         self.idleAnimate = list(map(lambda x: pygame.transform.scale(pygame.image.load(x), gc.playerSize), arr))
+        arr = ['assets/Player/adventurer-attack1-00.png', 'assets/Player/adventurer-attack1-01.png',
+               'assets/Player/adventurer-attack1-02.png']
+        self.attackAnimate = list(map(lambda x: pygame.transform.scale(pygame.image.load(x), gc.playerSize), arr))
+
+        self.currAnimate = self.idleAnimate
+        self.animationOffset = 10
         self.image = self.idleAnimate[0]
         self.animationVariable = 0
 
+    def animate(self):
+        if self.animationVariable + 1 == len(self.currAnimate) * self.animationOffset:
+            self.currAnimate = self.idleAnimate
+            self.animationVariable = 0
+        self.animationVariable = (self.animationVariable + 1) % (len(self.currAnimate) * self.animationOffset)
+        self.image = pygame.transform.flip(self.currAnimate[self.animationVariable // self.animationOffset],
+                                           not self.facing, False)
+
     def update(self):
-        self.animationVariable = (self.animationVariable + 1) % (len(self.idleAnimate) * 10)
-        self.image = pygame.transform.flip(self.idleAnimate[self.animationVariable // 10], not self.facing, False)
+        self.animate()
         self.rect = self.rect.move(self.velocity)
         # cheat code
         if pygame.key.get_pressed()[pygame.K_F1]:
@@ -308,6 +321,7 @@ class player(combatEntity):
 
     def meleeAttack(self, aType: bool):
         # aType true means heavy attack false means light attack
+        self.currAnimate = self.attackAnimate
         for i in self.enemy:
             if self.facing and 0 < i.rect.x - self.rect.x < 100 and abs(self.rect.y - i.rect.y) < 200:
                 if aType:
