@@ -322,6 +322,7 @@ class player(combatEntity):
     def meleeAttack(self, aType: bool):
         # aType true means heavy attack false means light attack
         self.currAnimate = self.attackAnimate
+        self.animationVariable = 0
         for i in self.enemy:
             if self.facing and 0 < i.rect.x - self.rect.x < 100 and abs(self.rect.y - i.rect.y) < 200:
                 if aType:
