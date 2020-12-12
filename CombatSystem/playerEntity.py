@@ -155,11 +155,11 @@ class player(combatEntity):
         self.dashing = False
         self.lockedEnemy = 0
         self.lock = [self.data.autoAim, self.lockedEnemy]
-        self.healthBar = screenElements.healthBar(self.group, entity=self,
+        self.healthBar = screenElements.healthBar(*self.group, entity=self,
                                                   position=(gc.screenSize[0] // 10, 10),
                                                   colors=(gc.color['GREEN'], gc.color["RED"]),
                                                   size=(gc.screenSize[0] // 2, 10), maxL=self.health)
-        self.stunDisplay = screenElements.stunBar(self.group, entity=self, position=(gc.screenSize[0] // 10, 20),
+        self.stunDisplay = screenElements.stunBar(*self.group, entity=self, position=(gc.screenSize[0] // 10, 20),
                                                   size=(gc.screenSize[0] // 2, 10),
                                                   maxlevel=self.stunBar.currentLevel())
         arr = ['assets/Player/adventurer-idle-00.png', 'assets/Player/adventurer-idle-01.png',
@@ -324,14 +324,14 @@ class player(combatEntity):
         self.currAnimate = self.attackAnimate
         self.animationVariable = 0
         for i in self.enemy:
-            if self.facing and 0 < i.rect.x - self.rect.x < 100 and abs(self.rect.y - i.rect.y) < 200:
+            if self.facing and 0 < i.rect.x - self.rect.x < 150 and abs(self.rect.y - i.rect.y) < 200:
                 if aType:
                     i.damage(int(30 * self.data.damageMultiplier))
                     print('[player]: heavy')
                 else:
                     i.damage(int(10 * self.data.damageMultiplier))
                     print('[player]: light')
-            elif not self.facing and 0 > i.rect.x - self.rect.x > -100 and abs(self.rect.y - i.rect.y) < 200:
+            elif not self.facing and 0 > i.rect.x - self.rect.x > -150 and abs(self.rect.y - i.rect.y) < 200:
                 if aType:
                     i.damage(int(30 * self.data.damageMultiplier))
                     print('[player]: heavy')
@@ -365,21 +365,25 @@ class player(combatEntity):
 class EnemyAI(combatEntity):
     def __init__(self, *groups, platform, time):
         super().__init__(*groups, platform=platform, time=time)
-        # self.image = pygame.transform.scale(pygame.image.load('assets/enemy.png'), self.rect.size)
         self.idleAnimate = spriteSheetManager.spriteSheetManager.get('assets/Enemy-Dark_Wraith/idle.png',
                                                                      (255, 255, 255), (500, 100), 4, gc.playerSize,
                                                                      True)
         self.heavyAttackAnimate = spriteSheetManager.spriteSheetManager.get(
             'assets/Enemy-Dark_Wraith/HeavyAttack.png', (255, 255, 255), (500, 100), 7, gc.playerSize, True)
+
+        self.currentAnimate = self.idleAnimate
+        self.animationVariable = 0
+        self.animationOffset = 10
+
         # somewhat working animation
-        self.image = self.idleAnimate[0]
+        self.image = self.currentAnimate[self.animationVariable]
         self.animationVariable = 0
         self.rect.x = 500
         self.walking = False
         self.invisibleRect = pygame.rect.Rect(self.rect.x - 50, self.rect.y, 225, self.rect.height)
         self.player = None
         self.healthBar = screenElements.healthBar(
-            self.group, entity=self, position=(),
+            *self.group, entity=self, position=(),
             colors=(gc.color['GREEN'], gc.color["RED"]),
             size=(gc.playerSize[0], 5), maxL=self.health
         )
@@ -391,8 +395,11 @@ class EnemyAI(combatEntity):
                 break
 
     def animate(self):
-        self.image = pygame.transform.flip(self.idleAnimate[self.animationVariable // 10], not self.facing, False)
-        self.animationVariable = (self.animationVariable + 1) % (10 * (len(self.idleAnimate)))
+        if self.animationVariable + 1 == len(self.currentAnimate) * self.animationOffset:
+            self.currentAnimate = self.idleAnimate
+            self.animationVariable = 0
+        self.image = pygame.transform.flip(self.currentAnimate[self.animationVariable // 10], not self.facing, False)
+        self.animationVariable = (self.animationVariable + 1) % (self.animationOffset * (len(self.currentAnimate)))
 
     def move(self):
         self.rect = self.rect.move(self.velocity)
@@ -476,6 +483,8 @@ class EnemyAI(combatEntity):
                 self.velocity[0] = +vel
 
     def attackPlayerHeavyDash(self):
+        self.currentAnimate = self.heavyAttackAnimate
+        self.animationVariable = 0
         x = random.randint(0, 10)
         if x != 1:
             return
