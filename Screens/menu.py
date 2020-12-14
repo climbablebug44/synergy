@@ -150,22 +150,9 @@ class OptionsMenu(Menu):
             self.game.check_events()
             self.game.display.fill((0, 0, 0))
             self.game.draw_text('Controls', 20, 50, 25)
-            # <-
+            # Names of controls
             for controls in range(12):
                 self.game.draw_text(self.controlNames[controls], 15, 200, 50 + (controls * 30))
-            '''self.game.draw_text('Move Forward ', 15, 200, 50)
-            self.game.draw_text('Move Backward', 15, 190, 80)
-            self.game.draw_text('Left Move', 15, 210, 110)
-            self.game.draw_text('Right Move', 15, 210, 140)
-            self.game.draw_text('Pause', 15, 220, 170)
-            self.game.draw_text('Continue', 15, 210, 200)
-            self.game.draw_text('Cam Up', 15, 210, 230)
-            self.game.draw_text('Side Cam', 15, 210, 260)
-            self.game.draw_text('Backspace', 15, 205, 290)
-            self.game.draw_text('Speed Up', 15, 210, 320)
-            self.game.draw_text('Fire ', 15, 230, 350)
-            self.game.draw_text('Quit', 15, 220, 380)'''
-            # ->
             self.game.window.blit(self.game.display, (0, 0))
             self.Change_controls()
             mouse = pygame.mouse.get_pos()
